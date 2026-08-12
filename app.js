@@ -10262,6 +10262,9 @@ async function clabRun() {
   const code = ta.value;
   if (!code.trim()) { out.innerHTML = '<span style="color:#75715e">（请先编写代码）</span>'; status.textContent='⚠ 等待输入'; status.style.color='#fbbf24'; return; }
 
+  const prevText = btn.textContent;
+  const stdinEl = document.getElementById('clabStdinArea');
+
   /* ── 打开运行终端窗口（总是弹出，类似 Dev-C++ 运行窗口） ── */
   _clabBindModalEvents();
   const modal = document.getElementById('clabRunModal');
@@ -10269,7 +10272,6 @@ async function clabRun() {
   const modalStatus = document.getElementById('clabModalStatus');
   const inputWrap = document.getElementById('clabModalInputWrap');
   const modalInput = document.getElementById('clabRunModalInput');
-  const stdinEl = document.getElementById('clabStdinArea');
 
   modal.style.display = 'flex';
   modalOut.innerHTML = '<span style="color:#75715e">⏳ 准备运行...</span>';
@@ -10282,10 +10284,17 @@ async function clabRun() {
     inputWrap.style.display = 'block';
     modalInput.value = '';
     setTimeout(function () { modalInput.focus(); }, 60);
-    /* 等待用户输入回车 / 点运行 / 跳过 */
+    /* 等待用户输入回车 / 点运行 / 跳过（提交后窗口保持打开，继续运行） */
+    _clabModalCancelled = false;
     await new Promise(function (resolve) {
       _clabModalCtx = { resolve: resolve };
     });
+    /* 用户点 ✕ / Esc 取消 → 不运行 */
+    if (_clabModalCancelled) {
+      btn.disabled = false;
+      btn.textContent = prevText || '▶ 运行';
+      return;
+    }
   } else {
     inputWrap.style.display = 'none';
   }
@@ -10299,7 +10308,6 @@ async function clabRun() {
   /* ② 真实编译引擎：Judge0 在线编译 */
   const lang = sel ? sel.value : 'c';
   btn.disabled = true;
-  const prevText = btn.textContent;
   btn.textContent = '⏳ 编译中…';
   status.textContent = '⏳ 编译中…';
   status.style.color = '#fbbf24';
@@ -10423,6 +10431,7 @@ function _clabBindModalEvents() {
   });
 }
 
+/* 提交输入（Enter / ▶运行按钮 / 不输入直接运行）：窗口保持打开，继续运行 */
 function _clabModalCommit(withInput) {
   const input = document.getElementById('clabRunModalInput');
   const stdinEl = document.getElementById('clabStdinArea');
@@ -10431,9 +10440,8 @@ function _clabModalCommit(withInput) {
   } else if (!withInput && stdinEl) {
     stdinEl.value = '';                   /* 跳过 → 空 stdin */
   }
-  /* 总是关闭窗口（运行前/运行后都能关） */
-  const modal = document.getElementById('clabRunModal');
-  if (modal) modal.style.display = 'none';
+  _clabModalCancelled = false;
+  /* 注意：不关闭窗口，让用户看到运行过程和结果 */
   if (_clabModalCtx) {
     const r = _clabModalCtx.resolve;
     _clabModalCtx = null;
@@ -10441,10 +10449,13 @@ function _clabModalCommit(withInput) {
   }
 }
 
-/* ✕ 关闭：无论运行前后都直接关窗（若在等待输入也释放 Promise 避免悬挂） */
+/* ✕ / Esc / 背景：取消并关闭窗口（若在等待输入也释放 Promise 避免悬挂） */
+let _clabModalCancelled = false;
+
 function clabRunModalSkip() {
   const modal = document.getElementById('clabRunModal');
   if (modal) modal.style.display = 'none';
+  _clabModalCancelled = true;
   if (_clabModalCtx) {
     const r = _clabModalCtx.resolve;
     _clabModalCtx = null;
