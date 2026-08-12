@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>互动课堂 · 重新定义学习方式</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+SC:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #08080c;
+      --surface: #0f0f15;
+      --card: #14141c;
+      --card-hover: #1a1a24;
+      --accent: #ff5d3b;
+      --accent-hover: #ed4a28;
+      --accent-soft: rgba(255,93,59,0.12);
+      --accent-glow: rgba(255,93,59,0.35);
+      --text: #f5f5f7;
+      --text-dim: #9a9aa6;
+      --text-mute: #56565f;
+      --border: rgba(255,255,255,0.06);
+      --border-med: rgba(255,255,255,0.10);
+      --green: #34d399;
+      --amber: #fbbf24;
+      --cyan: #22d3ee;
+      --purple: #a78bfa;
+      --mx: 50vw;
+      --my: 50vh;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      cursor: none;
+    }
+
+    /* ===== Custom Cursor ===== */
+    .cursor-dot {
+      position: fixed; width: 6px; height: 6px;
+      background: var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed; width: 32px; height: 32px;
+      border: 1.5px solid rgba(255,93,59,0.4); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width 0.3s, height 0.3s, border-color 0.3s, opacity 0.3s;
+    }
+    .cursor-ring.hover { width: 48px; height: 48px; border-color: var(--accent); }
+    .cursor-dot.hover { width: 10px; height: 10px; }
+
+    /* ===== Mouse-follow glow ===== */
+    .mouse-glow {
+      position: fixed; width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent-glow), transparent 65%);
+      left: var(--mx); top: var(--my);
+      transform: translate(-50%,-50%);
+      pointer-events: none; z-index: 0;
+      opacity: 0.4; filter: blur(40px);
+      transition: opacity 0.3s;
+    }
+
+    /* ===== Dot grid + noise ===== */
+    .bg-pattern {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .bg-pattern::after {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,93,59,0.06), transparent),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167,139,250,0.04), transparent);
+    }
+
+    /* ===== 3D Perspective Container ===== */
+    .scene { perspective: 1200px; }
+
+    /* ===== Nav ===== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 1rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(8,8,12,0.7);
+      backdrop-filter: blur(20px) saturate(1.5);
+      -webkit-backdrop-filter: blur(20px) saturate(1.5);
+      border-bottom-color: var(--border);
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 1rem; font-weight: 700; color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .nav-brand-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), #ff7a5c);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      box-shadow: 0 4px 16px rgba(255,93,59,0.4);
+      transform: translateZ(0);
+      transition: transform 0.3s;
+    }
+    .nav-brand:hover .nav-brand-icon { transform: rotate(-8deg) scale(1.05); }
+    .nav-actions { display: flex; gap: 0.5rem; }
+    .nav-btn {
+      padding: 0.55rem 1.2rem; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; cursor: none;
+      font-family: inherit; border: none; transition: all 0.25s;
+    }
+    .nav-btn.ghost {
+      background: transparent; color: var(--text-dim);
+      border: 1px solid var(--border-med);
+    }
+    .nav-btn.ghost:hover { border-color: var(--text-dim); color: var(--text); background: rgba(255,255,255,0.03); }
+    .nav-btn.solid {
+      background: linear-gradient(135deg, var(--accent), #ff7a5c);
+      color: white;
+      box-shadow: 0 4px 20px rgba(255,93,59,0.35);
+    }
+    .nav-btn.solid:hover { box-shadow: 0 6px 28px rgba(255,93,59,0.5); transform: translateY(-1px); }
+    .nav-btn.ach-btn {
+      background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(139,92,246,0.15));
+      border: 1px solid rgba(167,139,250,0.35); color: #c4b5fd;
+      text-decoration: none; display: inline-flex; align-items: center;
+    }
+    .nav-btn.ach-btn:hover {
+      background: linear-gradient(135deg, rgba(167,139,250,0.35), rgba(139,92,246,0.25));
+      border-color: rgba(167,139,250,0.6); color: #ddd6fe;
+      box-shadow: 0 4px 20px rgba(167,139,250,0.3);
+      transform: translateY(-1px);
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 6rem 2.5rem 4rem;
+      max-width: 1200px; margin: 0 auto;
+      transform-style: preserve-3d;
+    }
+    .hero-layer { transform-style: preserve-3d; transition: transform 0.1s ease-out; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: var(--accent-soft); border: 1px solid rgba(255,93,59,0.2);
+      border-radius: 100px; font-size: 0.8rem; color: var(--accent);
+      margin-bottom: 1.8rem; width: fit-content;
+      backdrop-filter: blur(10px);
+    }
+    .hero-tag-dot {
+      width: 6px; height: 6px; background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.2rem);
+      font-weight: 900; line-height: 1.02;
+      letter-spacing: -0.045em;
+      margin-bottom: 1.5rem;
+      max-width: 900px;
+    }
+    .hero h1 .em {
+      background: linear-gradient(135deg, var(--accent), #ff8a6c);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--text-dim);
+      max-width: 540px; line-height: 1.7;
+      margin-bottom: 2.5rem;
+    }
+    .hero-cta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn-go {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.9rem 2rem; border-radius: 12px;
+      font-size: 0.95rem; font-weight: 700; cursor: none;
+      text-decoration: none; font-family: inherit; border: none;
+      transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .btn-go.primary {
+      background: linear-gradient(135deg, var(--accent), #ff7a5c);
+      color: white;
+      box-shadow: 0 8px 30px rgba(255,93,59,0.35);
+    }
+    .btn-go.primary:hover { box-shadow: 0 12px 40px rgba(255,93,59,0.5); transform: translateY(-2px); }
+    .btn-go.primary::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%); transition: transform 0.5s;
+    }
+    .btn-go.primary:hover::after { transform: translateX(100%); }
+    .btn-go.secondary {
+      background: rgba(255,255,255,0.04); color: var(--text-dim);
+      border: 1px solid var(--border-med);
+      backdrop-filter: blur(10px);
+    }
+    .btn-go.secondary:hover { border-color: var(--text-dim); color: var(--text); background: rgba(255,255,255,0.08); }
+    .btn-go .arrow { transition: transform 0.25s; }
+    .btn-go.primary:hover .arrow { transform: translateX(4px); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem;
+      flex-wrap: wrap;
+    }
+    .hero-stat { position: relative; }
+    .hero-stat-num {
+      font-size: 2.2rem; font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text); letter-spacing: -0.03em;
+      text-shadow: 0 0 30px rgba(255,93,59,0.1);
+    }
+    .hero-stat-num .unit { color: var(--accent); }
+    .hero-stat-label {
+      font-size: 0.8rem; color: var(--text-mute);
+      margin-top: 2px;
+    }
+
+    /* ===== 3D Floating shapes ===== */
+    .float-shapes { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .float-shape {
+      position: absolute; border-radius: 20%;
+      opacity: 0.06; filter: blur(2px);
+    }
+    .float-shape.s1 {
+      width: 200px; height: 200px;
+      background: var(--accent);
+      top: 15%; right: 8%;
+      animation: float1 12s ease infinite;
+    }
+    .float-shape.s2 {
+      width: 140px; height: 140px;
+      background: var(--purple);
+      bottom: 20%; right: 25%;
+      animation: float2 15s ease infinite;
+    }
+    .float-shape.s3 {
+      width: 100px; height: 100px;
+      background: var(--cyan);
+      top: 40%; right: 15%;
+      animation: float3 10s ease infinite;
+    }
+    @keyframes float1 { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(-20px,30px) rotate(180deg); } }
+    @keyframes float2 { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(25px,-20px) rotate(-180deg); } }
+    @keyframes float3 { 0%,100% { transform: translate(0,0) rotate(0deg); } 33% { transform: translate(-15px,-25px) rotate(120deg); } 66% { transform: translate(20px,15px) rotate(240deg); } }
+
+    /* ===== Features ===== */
+    .section {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 5rem 2.5rem;
+    }
+    .section-label {
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--accent); margin-bottom: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800; letter-spacing: -0.03em;
+      margin-bottom: 0.75rem; line-height: 1.15;
+    }
+    .section-desc {
+      color: var(--text-dim); font-size: 1rem;
+      max-width: 500px; margin-bottom: 3rem;
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(160px, auto);
+      gap: 14px;
+      perspective: 1000px;
+    }
+    .tile {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.6rem;
+      display: flex; flex-direction: column; gap: 0.6rem;
+      text-decoration: none; color: inherit;
+      cursor: none; position: relative; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+    .tile::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle 200px at var(--tx,50%) var(--ty,50%), rgba(255,93,59,0.12), transparent 60%);
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .tile:hover::before { opacity: 1; }
+    .tile:hover {
+      border-color: rgba(255,93,59,0.3);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,93,59,0.1);
+    }
+    .tile.wide { grid-column: span 2; }
+    .tile.tall { grid-row: span 2; }
+    .tile-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.25rem; color: var(--accent);
+      background: var(--accent-soft);
+      transform: translateZ(20px);
+      transition: transform 0.3s;
+    }
+    .tile:hover .tile-icon { transform: translateZ(35px) scale(1.05); }
+    .tile h3 { font-size: 1.05rem; font-weight: 700; transform: translateZ(15px); }
+    .tile p { color: var(--text-dim); font-size: 0.85rem; line-height: 1.55; transform: translateZ(10px); }
+    .tile.wide p { max-width: 340px; }
+    .tile .tile-mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem; font-weight: 700;
+      color: var(--accent); margin-top: auto;
+      transform: translateZ(25px);
+    }
+
+    /* ===== CTA ===== */
+    .cta-wrap {
+      max-width: 1200px; margin: 0 auto;
+      padding: 3rem 2.5rem 5rem;
+    }
+    .cta-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 4rem 3rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; top: -50%; left: 50%;
+      transform: translateX(-50%);
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--accent-glow), transparent 60%);
+      pointer-events: none; filter: blur(30px);
+    }
+    .cta-box h2 {
+      font-size: 2rem; font-weight: 800;
+      margin-bottom: 0.6rem; letter-spacing: -0.03em;
+      position: relative;
+    }
+    .cta-box p {
+      color: var(--text-dim); margin-bottom: 2rem;
+      position: relative;
+    }
+    .cta-box .btn-go { position: relative; }
+
+    /* ===== Footer ===== */
+    .footer {
+      text-align: center; padding: 2.5rem 2rem;
+      color: var(--text-mute); font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 1;
+    }
+
+    /* ===== Modal ===== */
+    .modal-bg {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 1000; display: flex; align-items: center;
+      justify-content: center; opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-bg.show { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border-med);
+      border-radius: 18px; padding: 2rem;
+      width: 90%; max-width: 380px; position: relative;
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.25s;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .modal-bg.show .modal { transform: translateY(0) scale(1); }
+    .modal-x {
+      position: absolute; top: 0.75rem; right: 0.75rem;
+      width: 28px; height: 28px; border-radius: 8px;
+      border: none; background: transparent; color: var(--text-mute);
+      cursor: none; display: flex; align-items: center; justify-content: center;
+      transition: color 0.2s, background 0.2s;
+    }
+    .modal-x:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+    .modal h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .modal-sub { color: var(--text-mute); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .field { margin-bottom: 0.85rem; }
+    .field label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; color: var(--text-dim); }
+    .field input {
+      width: 100%; padding: 0.7rem 0.9rem;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); font-size: 0.9rem;
+      font-family: inherit; outline: none; transition: border-color 0.2s, background 0.2s;
+    }
+    .field input:focus { border-color: var(--accent); background: rgba(255,255,255,0.06); }
+    .modal-btn {
+      width: 100%; padding: 0.8rem; background: linear-gradient(135deg, var(--accent), #ff7a5c);
+      border: none; border-radius: 10px; color: white;
+      font-weight: 700; font-size: 0.9rem; cursor: none;
+      font-family: inherit; margin-top: 0.5rem; transition: box-shadow 0.2s;
+      box-shadow: 0 4px 20px rgba(255,93,59,0.3);
+    }
+    .modal-btn:hover { box-shadow: 0 6px 28px rgba(255,93,59,0.5); }
+    .modal-switch { text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-mute); }
+    .modal-switch a { color: var(--accent); cursor: none; text-decoration: none; font-weight: 600; }
+    .modal-switch a:hover { text-decoration: underline; }
+
+    /* ===== Reveal animation ===== */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s, transform 0.6s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 1024px) {
+      .bento { grid-template-columns: repeat(2, 1fr); }
+      .tile.wide { grid-column: span 2; }
+    }
+    @media (max-width: 768px) {
+      body { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+      .nav { padding: 1rem 1.5rem; }
+      .hero { padding: 5rem 1.5rem 3rem; }
+      .hero h1 { font-size: 2.4rem; }
+      .hero p { font-size: 1rem; }
+      .hero-stats { gap: 1.5rem; }
+      .section { padding: 3rem 1.5rem; }
+      .bento { grid-template-columns: 1fr; }
+      .tile.wide { grid-column: span 1; }
+      .cta-box { padding: 2.5rem 1.5rem; }
+      .nav-btn { padding: 0.4rem 0.85rem; font-size: 0.8rem; cursor: pointer; }
+      .btn-go, .modal-btn, .modal-x, .modal-switch a { cursor: pointer; }
+    }
+
+    /* ===== Scroll Progress Bar ===== */
+    .scroll-progress {
+      position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--purple), var(--cyan));
+      z-index: 9997; transition: width 0.1s;
+      box-shadow: 0 0 10px rgba(255,93,59,0.5);
+    }
+
+    /* ===== Particle Canvas ===== */
+    #particleCanvas {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    }
+
+    /* ===== Interactive Demo Section ===== */
+    .demo-section {
+      position: relative; z-index: 1;
+      max-width: 1200px; margin: 0 auto;
+      padding: 3rem 2.5rem 5rem;
+    }
+    .demo-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; perspective: 1000px;
+    }
+    .demo-card.full {
+      grid-column: span 2;
+    }
+    .demo-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.8rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .demo-card:hover {
+      border-color: rgba(255,93,59,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .demo-card h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .demo-card .demo-desc {
+      color: var(--text-dim); font-size: 0.82rem; margin-bottom: 1.2rem;
+    }
+    .demo-badge {
+      font-size: 0.65rem; font-weight: 600; padding: 2px 8px;
+      border-radius: 6px; background: var(--accent-soft);
+      color: var(--accent); font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Function plotter */
+    .plotter-canvas-wrap {
+      position: relative; border-radius: 10px; overflow: hidden;
+      background: #0a0a0f; border: 1px solid var(--border);
+    }
+    #plotterCanvas { display: block; width: 100%; height: 220px; }
+    .plotter-controls {
+      display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;
+    }
+    .slider-group { flex: 1; min-width: 100px; }
+    .slider-group label {
+      display: flex; justify-content: space-between;
+      font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .slider-group label .val { color: var(--accent); }
+    .slider-group input[type=range] {
+      width: 100%; -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08);
+      outline: none; cursor: none;
+    }
+    .slider-group input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--accent); cursor: none;
+      box-shadow: 0 0 8px rgba(255,93,59,0.5);
+    }
+    .plotter-fn-tabs {
+      display: flex; gap: 6px; margin-bottom: 0.8rem;
+    }
+    .fn-tab {
+      padding: 4px 12px; border-radius: 6px; font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace; cursor: none;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-dim); transition: all 0.2s;
+    }
+    .fn-tab.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(255,93,59,0.3); }
+    .fn-tab:hover { color: var(--text); }
+
+    /* AI Chat demo */
+    .chat-demo {
+      height: 280px; overflow-y: auto; padding-right: 4px;
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .chat-demo::-webkit-scrollbar { width: 4px; }
+    .chat-demo::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .chat-msg {
+      max-width: 85%; padding: 0.6rem 0.9rem; border-radius: 12px;
+      font-size: 0.82rem; line-height: 1.5; position: relative;
+      animation: chatFadeIn 0.3s ease;
+    }
+    @keyframes chatFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .chat-msg.user {
+      align-self: flex-end; background: linear-gradient(135deg, var(--accent), #ff7a5c);
+      color: white; border-bottom-right-radius: 4px;
+    }
+    .chat-msg.ai {
+      align-self: flex-start; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-msg.ai .typing-cursor {
+      display: inline-block; width: 7px; height: 1em; vertical-align: text-bottom;
+      background: var(--accent); margin-left: 2px;
+      animation: blink 0.8s steps(2) infinite;
+    }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .chat-msg .chat-label {
+      font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 3px; opacity: 0.6;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .chat-restart {
+      position: absolute; top: 1.2rem; right: 1.2rem;
+      width: 28px; height: 28px; border-radius: 8px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-mute); cursor: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .chat-restart:hover { color: var(--accent); border-color: rgba(255,93,59,0.3); }
+
+    /* Physics sandbox */
+    .physics-wrap {
+      position: relative; border-radius: 10px; overflow: hidden;
+      background: #0a0a0f; border: 1px solid var(--border);
+    }
+    #physicsCanvas { display: block; width: 100%; height: 200px; cursor: none; }
+    .physics-hint {
+      font-size: 0.72rem; color: var(--text-mute); margin-top: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+    .physics-btns { display: flex; gap: 6px; margin-top: 0.6rem; }
+    .physics-btn {
+      padding: 4px 12px; border-radius: 6px; font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace; cursor: none;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--text-dim); transition: all 0.2s;
+    }
+    .physics-btn:hover { color: var(--accent); border-color: rgba(255,93,59,0.3); }
+
+    /* ===== Live badge ===== */
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+      display: inline-block; box-shadow: 0 0 8px var(--green);
+      animation: pulse 2s ease infinite;
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid { grid-template-columns: 1fr; }
+      .fn-tab, .slider-group input[type=range], .chat-restart { cursor: pointer; }
+    }
+
+    /* ===== Glitch Button ===== */
+    .btn-glitch {
+      padding: 16px 20px;
+      font-size: 18px;
+      background: linear-gradient(45deg, transparent 5%, #ff013c 5%);
+      border: 0;
+      color: #fff;
+      letter-spacing: 3px;
+      line-height: 1;
+      box-shadow: 6px 0px 0px #00e6f6;
+      outline: transparent;
+      position: relative;
+      cursor: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.2s;
+    }
+    .btn-glitch:hover { box-shadow: 6px 0px 20px rgba(0,230,246,0.4); }
+    .btn-glitch::after {
+      --slice-0: inset(50% 50% 50% 50%);
+      --slice-1: inset(80% -6px 0 0);
+      --slice-2: inset(50% -6px 30% 0);
+      --slice-3: inset(10% -6px 85% 0);
+      --slice-4: inset(40% -6px 43% 0);
+      --slice-5: inset(80% -6px 5% 0);
+      content: attr(data-text);
+      display: block;
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(45deg, transparent 3%, #00e6f6 3%, #00e6f6 5%, #ff013c 5%);
+      text-shadow: -3px -3px 0px #f8f005, 3px 3px 0px #00e6f6;
+      clip-path: var(--slice-0);
+      pointer-events: none;
+    }
+    .btn-glitch:hover::after {
+      animation: 1s glitch;
+      animation-timing-function: steps(2, end);
+    }
+    @keyframes glitch {
+      0% { clip-path: var(--slice-1); transform: translate(-20px, -10px); }
+      10% { clip-path: var(--slice-3); transform: translate(10px, 10px); }
+      20% { clip-path: var(--slice-1); transform: translate(-10px, 10px); }
+      30% { clip-path: var(--slice-3); transform: translate(0px, 5px); }
+      40% { clip-path: var(--slice-2); transform: translate(-5px, 0px); }
+      50% { clip-path: var(--slice-3); transform: translate(5px, 0px); }
+      60% { clip-path: var(--slice-4); transform: translate(5px, 10px); }
+      70% { clip-path: var(--slice-2); transform: translate(-10px, 10px); }
+      80% { clip-path: var(--slice-5); transform: translate(20px, -10px); }
+      90% { clip-path: var(--slice-1); transform: translate(-10px, 0px); }
+      100% { clip-path: var(--slice-1); transform: translate(0); }
+    }
+
+    @media (max-width: 768px) {
+      .btn-glitch { cursor: pointer; }
+      .premium-card { cursor: pointer; }
+      .svg-switch-container, .svg-switch-container label { cursor: pointer; }
+    }
+
+    /* ===== SVG Toggle Switch ===== */
+    .noselect {
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    .svg-switch-container {
+      width: 10em;
+      display: inline-block;
+      --switch-on-color: #4ade80;
+      cursor: none;
+    }
+    .svg-switch-container input[type=checkbox] { display: none; }
+    .svg-switch-container label {
+      cursor: none;
+      display: block;
+    }
+    .svg-switch-container .switch-track {
+      fill: #c4c9d4;
+      transition: fill 0.4s ease;
+    }
+    .svg-switch-container .switch-knob {
+      fill: #fff;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .svg-switch-container .text-label {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      fill: #6D7788;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+      pointer-events: none;
+    }
+    .svg-switch-container .switch-on-text { opacity: 0; transition: opacity 0.3s ease 0.1s; }
+    .svg-switch-container .switch-off-text { opacity: 1; transition: opacity 0.3s ease; }
+    .svg-switch-container input[type=checkbox]:checked + label .switch-track {
+      fill: var(--switch-on-color);
+    }
+    .svg-switch-container input[type=checkbox]:checked + label .switch-knob {
+      transform: translateX(120px);
+    }
+    .svg-switch-container input[type=checkbox]:checked + label .switch-on-text { opacity: 1; }
+    .svg-switch-container input[type=checkbox]:checked + label .switch-off-text { opacity: 0; }
+
+    /* ===== Premium Card (金棕质感) ===== */
+    .premium-card {
+      width: 300px; height: 200px;
+      background: #243137;
+      position: relative;
+      display: grid;
+      place-content: center;
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.5s ease-in-out;
+      cursor: none;
+    }
+    .premium-card .pc-border {
+      position: absolute; inset: 0;
+      border: 2px solid #bd9f67;
+      opacity: 0;
+      transform: rotate(10deg);
+      transition: all 0.5s ease-in-out;
+      pointer-events: none;
+    }
+    .premium-card .pc-bottom-text {
+      position: absolute;
+      left: 50%; bottom: 13px;
+      transform: translateX(-50%);
+      font-size: 6px;
+      text-transform: uppercase;
+      padding: 0 5px 0 8px;
+      color: #bd9f67;
+      background: #243137;
+      opacity: 0;
+      letter-spacing: 7px;
+      transition: all 0.5s ease-in-out;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .premium-card .pc-content { transition: all 0.5s ease-in-out; }
+    .premium-card .pc-content .pc-logo {
+      height: 35px;
+      position: relative;
+      width: 33px;
+      overflow: hidden;
+      transition: all 1s ease-in-out;
+    }
+    .premium-card .pc-content .pc-logo .pc-logo1 {
+      height: 33px;
+      position: absolute;
+      left: 0;
+    }
+    .premium-card .pc-content .pc-logo .pc-logo2 {
+      height: 33px;
+      position: absolute;
+      left: 33px;
+    }
+    .premium-card .pc-content .pc-logo .pc-trail {
+      position: absolute;
+      right: 0; top: 0;
+      height: 100%; width: 100%;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .premium-card .pc-content .pc-logo-bottom-text {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      margin-top: 30px;
+      color: #bd9f67;
+      padding-left: 8px;
+      font-size: 11px;
+      opacity: 0;
+      letter-spacing: 0;
+      transition: all 0.5s ease-in-out 0.5s;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .premium-card:hover {
+      border-radius: 0;
+      transform: scale(1.1);
+    }
+    .premium-card:hover .pc-logo {
+      width: 134px;
+      animation: pc-opacity 1s ease-in-out;
+    }
+    .premium-card:hover .pc-border {
+      inset: 15px;
+      opacity: 1;
+      transform: rotate(0);
+    }
+    .premium-card:hover .pc-bottom-text {
+      letter-spacing: 3px;
+      opacity: 1;
+    }
+    .premium-card:hover .pc-logo-bottom-text {
+      opacity: 1;
+      letter-spacing: 9.5px;
+    }
+    .premium-card:hover .pc-trail {
+      animation: pc-trail 1s ease-in-out;
+    }
+    @keyframes pc-opacity {
+      0% { border-right: 1px solid transparent; }
+      10% { border-right: 1px solid #bd9f67; }
+      80% { border-right: 1px solid #bd9f67; }
+      100% { border-right: 1px solid transparent; }
+    }
+    @keyframes pc-trail {
+      0% { background: linear-gradient(90deg, rgba(189,159,103,0) 90%, rgb(189,159,103) 100%); opacity: 0; }
+      30% { background: linear-gradient(90deg, rgba(189,159,103,0) 70%, rgb(189,159,103) 100%); opacity: 1; }
+      70% { background: linear-gradient(90deg, rgba(189,159,103,0) 70%, rgb(189,159,103) 100%); opacity: 1; }
+      95% { background: linear-gradient(90deg, rgba(189,159,103,0) 90%, rgb(189,159,103) 100%); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Background layers -->
+  <div class="mouse-glow" id="mouseGlow"></div>
+  <div class="bg-pattern"></div>
+
+  <!-- Nav -->
+  <nav class="nav" id="nav">
+    <div class="nav-brand">
+      <div class="nav-brand-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      互动课堂
+    </div>
+    <div class="nav-actions">
+      <a href="achievements.html" class="nav-btn ach-btn">🏆 成就</a>
+      <button class="nav-btn ghost" onclick="openAuth('login')">登录</button>
+      <button class="nav-btn solid" onclick="openAuth('register')">注册</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero scene" id="hero">
+    <div class="float-shapes">
+      <canvas id="particleCanvas"></canvas>
+    </div>
+
+    <div class="hero-layer" data-depth="20">
+      <div class="hero-tag">
+        <span class="hero-tag-dot"></span>
+        人工智能学院 · 创新训练项目
+      </div>
+      <h1>
+        基于 Agentic AI<br>
+        的<span class="em">互动课堂</span>
+      </h1>
+      <p>
+        以 AI 驱动的互动式学习平台 — 智能问答、公式可视化、自适应练习、知识图谱，四位一体重新定义学习方式
+      </p>
+      <div class="hero-cta">
+        <a href="app.html" class="btn-go primary magnetic">
+          开始探索
+          <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="#features" class="btn-go secondary magnetic">
+          了解更多
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-layer" data-depth="40">
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="65">0<span class="unit">章</span></div>
+          <div class="hero-stat-label">多课程全覆盖</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="265">0<span class="unit">+</span></div>
+          <div class="hero-stat-label">精细知识点</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-count="900">0<span class="unit">+</span></div>
+          <div class="hero-stat-label">配套练习题</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features">
+    <div class="reveal">
+      <div class="section-label">// FEATURES</div>
+      <h2 class="section-title">选择互动课堂的理由</h2>
+      <p class="section-desc">对比传统学习平台，我们如何让 AI 互动学习更高效</p>
+    </div>
+
+    <div class="bento reveal">
+      <a href="app.html" class="tile wide tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>AI 智能辅导</h3>
+        <p>基于大语言模型实时问答。公式推导、概念解释、举一反三 — 遇到不懂的随时提问，秒级获得详细解答，不用等老师。</p>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </div>
+        <h3>公式实验室</h3>
+        <p>积分、极限、导数、级数</p>
+        <div class="tile-mono">∫ lim d/dx Σ</div>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+        </div>
+        <h3>交互式可视化</h3>
+        <p>15+ 种数学可视化，拖拽滑块实时看变化</p>
+      </a>
+
+      <a href="app.html" class="tile wide tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <h3>全局搜索</h3>
+        <p>跨课程、跨知识点即时搜索。输入即得结果，无论查公式、定理还是练习题，一搜即达。</p>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        </div>
+        <h3>知识图谱</h3>
+        <p>动态力导向图，知识点关联一目了然</p>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <h3>学习追踪</h3>
+        <p>章节进度、时长、活跃热力图</p>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 11c1.657 0 3 1.343 3 3v2"/></svg>
+        </div>
+        <h3>学习社区</h3>
+        <p>发帖讨论，和同学交流心得</p>
+      </a>
+
+      <a href="app.html" class="tile tilt-card">
+        <div class="tile-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <h3>代码运行</h3>
+        <p>C/C++ 在线编译，实时看输出</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Interactive Demo -->
+  <section class="demo-section reveal" id="demo">
+    <div class="reveal">
+      <div class="section-label">// LIVE DEMO</div>
+      <h2 class="section-title">先玩玩看</h2>
+      <p class="section-desc">别光听我说，下面两个模块直接可以交互 — 拖滑块、看AI回复，感受一下。</p>
+    </div>
+
+    <div class="demo-grid">
+      <!-- Function Plotter -->
+      <div class="demo-card">
+        <h3>
+          <span class="demo-badge">PLOT</span>
+          函数可视化实验台
+        </h3>
+        <p class="demo-desc">拖动滑块实时看波形变化 — 这就是课堂里的公式实验室</p>
+
+        <div class="plotter-fn-tabs">
+          <button class="fn-tab active" data-fn="sin" onclick="switchFn('sin')">y = A·sin(ωx+φ)</button>
+          <button class="fn-tab" data-fn="cos" onclick="switchFn('cos')">y = A·cos(ωx+φ)</button>
+          <button class="fn-tab" data-fn="tan" onclick="switchFn('tan')">y = A·tan(ωx+φ)</button>
+        </div>
+
+        <div class="plotter-canvas-wrap">
+          <canvas id="plotterCanvas"></canvas>
+        </div>
+
+        <div class="plotter-controls">
+          <div class="slider-group">
+            <label>振幅 A <span class="val" id="ampVal">1.0</span></label>
+            <input type="range" id="ampSlider" min="0.1" max="3" step="0.1" value="1">
+          </div>
+          <div class="slider-group">
+            <label>频率 ω <span class="val" id="freqVal">1.0</span></label>
+            <input type="range" id="freqSlider" min="0.1" max="5" step="0.1" value="1">
+          </div>
+          <div class="slider-group">
+            <label>相位 φ <span class="val" id="phaseVal">0.0</span></label>
+            <input type="range" id="phaseSlider" min="0" max="6.28" step="0.1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Chat Demo -->
+      <div class="demo-card" style="position:relative">
+        <h3>
+          <span class="live-dot"></span>
+          <span class="demo-badge">AI</span>
+          AI 辅导实时演示
+        </h3>
+        <p class="demo-desc">看看 AI 怎么回答高数问题 — 自动播放中</p>
+        <button class="chat-restart" onclick="restartChat()" title="重新播放">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <div class="chat-demo" id="chatDemo"></div>
+      </div>
+
+      <!-- Physics Sandbox -->
+      <div class="demo-card full">
+        <h3>
+          <span class="demo-badge">PLAY</span>
+          物理弹球沙盒 — 拖一个试试
+        </h3>
+        <p class="demo-desc">点击空白处生成弹球，拖拽扔出去，球之间会碰撞反弹 — 纯 Canvas 物理引擎</p>
+        <div class="physics-wrap">
+          <canvas id="physicsCanvas"></canvas>
+        </div>
+        <div class="physics-btns">
+          <button class="physics-btn" onclick="addBall()">+ 加球</button>
+          <button class="physics-btn" onclick="toggleGravity()">切换重力</button>
+          <button class="physics-btn" onclick="clearBalls()">清空</button>
+          <button class="physics-btn" onclick="explodeBalls()">爆炸！</button>
+        </div>
+        <div class="physics-hint">
+          <span class="live-dot"></span>
+          拖拽球体可以扔出去 · 点击空白处生成新球
+        </div>
+      </div>
+
+      <!-- Glitch Button Showcase -->
+      <div class="demo-card full">
+        <h3>
+          <span class="demo-badge">GLITCH</span>
+          赛博朋克故障按钮 — 悬停触发
+        </h3>
+        <p class="demo-desc">hover 上去看看 — clip-path 切片 + transform 位移制造的故障撕裂效果，纯 CSS 实现</p>
+        <div class="glitch-showcase" style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:center;padding:1.5rem 0;">
+          <a href="app.html" class="btn-glitch" data-text="ENTER">ENTER</a>
+          <a href="app.html" class="btn-glitch" data-text="开始学习" style="background:linear-gradient(45deg,transparent 5%,#7c3aed 5%);box-shadow:6px 0px 0px #22d3ee;">开始学习</a>
+          <a href="app.html" class="btn-glitch" data-text="SUBMIT" style="background:linear-gradient(45deg,transparent 5%,#059669 5%);box-shadow:6px 0px 0px #fbbf24;">SUBMIT</a>
+          <span style="color:var(--text-mute);font-size:0.8rem;font-family:'JetBrains Mono',monospace;">← hover each one</span>
+        </div>
+      </div>
+
+      <!-- Premium Card Showcase -->
+      <div class="demo-card full">
+        <h3>
+          <span class="demo-badge">PREMIUM</span>
+          金棕质感卡片 — 悬停展开
+        </h3>
+        <p class="demo-desc">hover 上去看看 — logo 展开露出 AI 字样 + 描边旋转归位 + 文字间距渐变动画</p>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;padding:2rem 0 2.5rem;">
+          <div class="premium-card">
+            <div class="pc-border"></div>
+            <div class="pc-content">
+              <div class="pc-logo">
+                <svg class="pc-logo1" viewBox="0 0 33 33" width="33" height="33">
+                  <path d="M16.5 5 L30 12 L16.5 19 L3 12 Z" fill="#bd9f67"/>
+                  <path d="M7 14 L7 22 Q16.5 26 26 22 L26 14" fill="none" stroke="#bd9f67" stroke-width="1.5"/>
+                  <line x1="27" y1="12" x2="27" y2="20" stroke="#bd9f67" stroke-width="1"/>
+                  <circle cx="27" cy="20.5" r="1" fill="#bd9f67"/>
+                </svg>
+                <svg class="pc-logo2" viewBox="0 0 33 33" width="33" height="33">
+                  <text x="2" y="25" font-size="20" font-family="JetBrains Mono, monospace" font-weight="bold" fill="none" stroke="#bd9f67" stroke-width="0.8">AI</text>
+                </svg>
+                <div class="pc-trail"></div>
+              </div>
+              <div class="pc-logo-bottom-text">互动课堂</div>
+            </div>
+            <div class="pc-bottom-text">AI POWERED LEARNING</div>
+          </div>
+          <div class="premium-card" style="background:#1a1a2e;">
+            <div class="pc-border" style="border-color:#e2b659;"></div>
+            <div class="pc-content">
+              <div class="pc-logo">
+                <svg class="pc-logo1" viewBox="0 0 33 33" width="33" height="33">
+                  <rect x="6" y="8" width="21" height="17" rx="1" fill="none" stroke="#e2b659" stroke-width="1.5"/>
+                  <line x1="16.5" y1="8" x2="16.5" y2="25" stroke="#e2b659" stroke-width="1"/>
+                  <path d="M10 13 L13 13 M10 16 L13 16 M20 13 L23 13 M20 16 L23 16" stroke="#e2b659" stroke-width="1"/>
+                </svg>
+                <svg class="pc-logo2" viewBox="0 0 33 33" width="33" height="33">
+                  <text x="1" y="25" font-size="18" font-family="JetBrains Mono, monospace" font-weight="bold" fill="none" stroke="#e2b659" stroke-width="0.8">2.0</text>
+                </svg>
+                <div class="pc-trail"></div>
+              </div>
+              <div class="pc-logo-bottom-text" style="color:#e2b659;">智能学习</div>
+            </div>
+            <div class="pc-bottom-text" style="color:#e2b659;background:#1a1a2e;">NEXT GEN EDUCATION</div>
+          </div>
+          <div class="premium-card" style="background:#1c2a1c;">
+            <div class="pc-border" style="border-color:#7cb342;"></div>
+            <div class="pc-content">
+              <div class="pc-logo">
+                <svg class="pc-logo1" viewBox="0 0 33 33" width="33" height="33">
+                  <circle cx="16.5" cy="16.5" r="11" fill="none" stroke="#7cb342" stroke-width="1.5"/>
+                  <path d="M16.5 8 L16.5 25 M8 16.5 L25 16.5" stroke="#7cb342" stroke-width="0.8"/>
+                  <circle cx="16.5" cy="16.5" r="4" fill="#7cb342"/>
+                </svg>
+                <svg class="pc-logo2" viewBox="0 0 33 33" width="33" height="33">
+                  <text x="2" y="25" font-size="18" font-family="JetBrains Mono, monospace" font-weight="bold" fill="none" stroke="#7cb342" stroke-width="0.8">GO</text>
+                </svg>
+                <div class="pc-trail"></div>
+              </div>
+              <div class="pc-logo-bottom-text" style="color:#7cb342;">实时互动</div>
+            </div>
+            <div class="pc-bottom-text" style="color:#7cb342;background:#1c2a1c;">REALTIME INTERACTION</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG Toggle Switch Showcase -->
+      <div class="demo-card full">
+        <h3>
+          <span class="demo-badge">TOGGLE</span>
+          SVG 矢量开关 — 点击切换
+        </h3>
+        <p class="demo-desc">knob 滑动 + 轨道变色 + 文字淡入淡出，纯 SVG 实现，zero bitmap</p>
+        <div style="display:flex;gap:2.5rem;flex-wrap:wrap;align-items:center;padding:2rem;background:#d5d9e0;border-radius:12px;">
+          <div class="svg-switch-container noselect" style="--switch-on-color:#4ade80;">
+            <input type="checkbox" id="cb-toggle-1" checked>
+            <label for="cb-toggle-1" class="control-element position-container">
+              <svg viewBox="0 0 200 80" width="100%" height="56">
+                <rect class="switch-track" x="5" y="10" width="190" height="60" rx="30"/>
+                <circle class="switch-knob" cx="40" cy="40" r="25"/>
+                <text class="text-label switch-on-text" x="70" y="46" font-size="14" text-anchor="middle">ON</text>
+                <text class="text-label switch-off-text" x="130" y="46" font-size="14" text-anchor="middle">OFF</text>
+              </svg>
+            </label>
+          </div>
+          <div class="svg-switch-container noselect" style="--switch-on-color:#3b82f6;">
+            <input type="checkbox" id="cb-toggle-2">
+            <label for="cb-toggle-2" class="control-element position-container">
+              <svg viewBox="0 0 200 80" width="100%" height="56">
+                <rect class="switch-track" x="5" y="10" width="190" height="60" rx="30"/>
+                <circle class="switch-knob" cx="40" cy="40" r="25"/>
+                <text class="text-label switch-on-text" x="70" y="46" font-size="14" text-anchor="middle">ON</text>
+                <text class="text-label switch-off-text" x="130" y="46" font-size="14" text-anchor="middle">OFF</text>
+              </svg>
+            </label>
+          </div>
+          <div class="svg-switch-container noselect" style="--switch-on-color:#ff5d3b;">
+            <input type="checkbox" id="cb-toggle-3">
+            <label for="cb-toggle-3" class="control-element position-container">
+              <svg viewBox="0 0 200 80" width="100%" height="56">
+                <rect class="switch-track" x="5" y="10" width="190" height="60" rx="30"/>
+                <circle class="switch-knob" cx="40" cy="40" r="25"/>
+                <text class="text-label switch-on-text" x="70" y="46" font-size="14" text-anchor="middle">ON</text>
+                <text class="text-label switch-off-text" x="130" y="46" font-size="14" text-anchor="middle">OFF</text>
+              </svg>
+            </label>
+          </div>
+          <div class="svg-switch-container noselect" style="--switch-on-color:#a78bfa;width:8em;">
+            <input type="checkbox" id="cb-toggle-4" checked>
+            <label for="cb-toggle-4" class="control-element position-container">
+              <svg viewBox="0 0 200 80" width="100%" height="44">
+                <rect class="switch-track" x="5" y="10" width="190" height="60" rx="30"/>
+                <circle class="switch-knob" cx="40" cy="40" r="25"/>
+                <text class="text-label switch-on-text" x="70" y="46" font-size="14" text-anchor="middle">ON</text>
+                <text class="text-label switch-off-text" x="130" y="46" font-size="14" text-anchor="middle">OFF</text>
+              </svg>
+            </label>
+          </div>
+          <span style="color:#6D7788;font-size:0.8rem;font-family:'JetBrains Mono',monospace;">← click to toggle</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap reveal">
+    <div class="cta-box">
+      <h2>准备好开始了吗？</h2>
+      <p class="cta-sub">无需下载，打开浏览器即刻体验 — Agentic AI 驱动，让学习变得高效有趣</p>
+      <p>无需下载，打开浏览器就能用 — AI 全程在线，学习不卡壳</p>
+      <a href="app.html" class="btn-glitch" data-text="ENTER 互动课堂">ENTER 互动课堂</a>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>互动课堂 · 人工智能学院 · 2026 &nbsp;|&nbsp; 基于 Agentic AI 的智能学习平台</p>
+  </footer>
+
+  <!-- Login Modal -->
+  <div class="modal-bg" id="loginModal">
+    <div class="modal">
+      <button class="modal-x" onclick="closeAuth()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3>欢迎回来</h3>
+      <p class="modal-sub">登录你的互动课堂账号</p>
+      <div class="field">
+        <label>邮箱 / 用户名</label>
+        <input type="text" placeholder="请输入邮箱或用户名" id="loginEmail">
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input type="password" placeholder="请输入密码" id="loginPwd">
+      </div>
+      <button class="modal-btn" onclick="handleLogin()">登录</button>
+      <div class="modal-switch">还没有账号？<a onclick="switchToRegister()">立即注册</a></div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal-bg" id="registerModal">
+    <div class="modal">
+      <button class="modal-x" onclick="closeAuth()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <h3>创建账号</h3>
+      <p class="modal-sub">加入互动课堂，开启 AI 学习之旅</p>
+      <div class="field">
+        <label>用户名</label>
+        <input type="text" placeholder="给自己取个名字吧" id="regName">
+      </div>
+      <div class="field">
+        <label>邮箱</label>
+        <input type="email" placeholder="请输入邮箱" id="regEmail">
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input type="password" placeholder="至少6位密码" id="regPwd">
+      </div>
+      <button class="modal-btn" onclick="handleRegister()">注册</button>
+      <div class="modal-switch">已有账号？<a onclick="switchToLogin()">立即登录</a></div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Custom cursor =====
+    var dot = document.getElementById('cursorDot');
+    var ring = document.getElementById('cursorRing');
+    var mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', function(e) {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top = my + 'px';
+      document.documentElement.style.setProperty('--mx', mx + 'px');
+      document.documentElement.style.setProperty('--my', my + 'px');
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.15;
+      ry += (my - ry) * 0.15;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // Hover effect on interactive elements
+    document.querySelectorAll('a, button, .tile, .nav-btn, .btn-go, .btn-glitch, .premium-card, .svg-switch-container label, .modal-btn, .modal-x, .modal-switch a, .fn-tab, .chat-restart, .physics-btn, input[type=range], #physicsCanvas').forEach(function(el) {
+      el.addEventListener('mouseenter', function() {
+        dot.classList.add('hover');
+        ring.classList.add('hover');
+      });
+      el.addEventListener('mouseleave', function() {
+        dot.classList.remove('hover');
+        ring.classList.remove('hover');
+      });
+    });
+
+    // ===== Nav scroll =====
+    window.addEventListener('scroll', function() {
+      var nav = document.getElementById('nav');
+      if (window.scrollY > 40) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+
+    // ===== Smooth scroll =====
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // ===== Hero 3D parallax =====
+    var hero = document.getElementById('hero');
+    hero.addEventListener('mousemove', function(e) {
+      var rect = hero.getBoundingClientRect();
+      var cx = (e.clientX - rect.left) / rect.width - 0.5;
+      var cy = (e.clientY - rect.top) / rect.height - 0.5;
+      hero.querySelectorAll('.hero-layer').forEach(function(layer) {
+        var depth = parseFloat(layer.dataset.depth) || 20;
+        var tx = cx * depth;
+        var ty = cy * depth;
+        layer.style.transform = 'translate3d(' + tx + 'px, ' + ty + 'px, 0)';
+      });
+    });
+    hero.addEventListener('mouseleave', function() {
+      hero.querySelectorAll('.hero-layer').forEach(function(layer) {
+        layer.style.transform = 'translate3d(0,0,0)';
+      });
+    });
+
+    // ===== 3D Tilt cards =====
+    document.querySelectorAll('.tilt-card').forEach(function(card) {
+      card.addEventListener('mousemove', function(e) {
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var centerX = rect.width / 2;
+        var centerY = rect.height / 2;
+        var rotateX = (y - centerY) / centerY * -7;
+        var rotateY = (x - centerX) / centerX * 7;
+        card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateZ(5px)';
+        card.style.setProperty('--tx', x + 'px');
+        card.style.setProperty('--ty', y + 'px');
+      });
+      card.addEventListener('mouseleave', function() {
+        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateZ(0)';
+      });
+    });
+
+    // ===== Magnetic buttons =====
+    document.querySelectorAll('.magnetic').forEach(function(btn) {
+      btn.addEventListener('mousemove', function(e) {
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - rect.left - rect.width / 2;
+        var y = e.clientY - rect.top - rect.height / 2;
+        btn.style.transform = 'translate(' + x * 0.25 + 'px, ' + y * 0.35 + 'px)';
+      });
+      btn.addEventListener('mouseleave', function() {
+        btn.style.transform = 'translate(0,0)';
+      });
+    });
+
+    // ===== Scroll reveal =====
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+    // ===== Auth =====
+    function openAuth(type) {
+      closeAuth();
+      var modal = document.getElementById(type === 'login' ? 'loginModal' : 'registerModal');
+      if (modal) modal.classList.add('show');
+    }
+    function closeAuth() {
+      document.getElementById('loginModal').classList.remove('show');
+      document.getElementById('registerModal').classList.remove('show');
+    }
+    function switchToRegister() { closeAuth(); document.getElementById('registerModal').classList.add('show'); }
+    function switchToLogin() { closeAuth(); document.getElementById('loginModal').classList.add('show'); }
+
+    function handleLogin() {
+      var email = document.getElementById('loginEmail').value.trim();
+      var pwd = document.getElementById('loginPwd').value.trim();
+      if (!email || !pwd) { alert('请填写完整信息'); return; }
+      var user = { name: email.split('@')[0] || email, email: email, loggedIn: true };
+      localStorage.setItem('hudongketang_user', JSON.stringify(user));
+      closeAuth();
+      window.location.href = 'app.html';
+    }
+
+    function handleRegister() {
+      var name = document.getElementById('regName').value.trim();
+      var email = document.getElementById('regEmail').value.trim();
+      var pwd = document.getElementById('regPwd').value.trim();
+      if (!name || !email || !pwd) { alert('请填写完整信息'); return; }
+      if (pwd.length < 6) { alert('密码至少6位'); return; }
+      var user = { name: name, email: email, loggedIn: true };
+      localStorage.setItem('hudongketang_user', JSON.stringify(user));
+      closeAuth();
+      window.location.href = 'app.html';
+    }
+
+    // ===== Scroll Progress Bar =====
+    var scrollProgress = document.getElementById('scrollProgress');
+    window.addEventListener('scroll', function() {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+      scrollProgress.style.width = pct + '%';
+    });
+
+    // ===== Enhanced Particle Network =====
+    (function() {
+      var canvas = document.getElementById('particleCanvas');
+      var ctx = canvas.getContext('2d');
+      var particles = [];
+      var bursts = [];
+      var mouse = { x: -999, y: -999, down: false };
+      var MAX_DIST = 130;
+      var colors = ['#ff5d3b', '#a78bfa', '#22d3ee', '#34d399', '#fbbf24'];
+
+      function resize() {
+        var hero = document.getElementById('hero');
+        canvas.width = hero.offsetWidth;
+        canvas.height = hero.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function makeParticle() {
+        var colorIdx = Math.floor(Math.random() * colors.length);
+        return {
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+          r: Math.random() * 2 + 0.8,
+          color: colors[colorIdx],
+          twinkle: Math.random() * Math.PI * 2,
+          twinkleSpeed: 0.02 + Math.random() * 0.03,
+          isStar: Math.random() > 0.6
+        };
+      }
+
+      var PARTICLE_COUNT = window.innerWidth < 768 ? 35 : 65;
+      for (var i = 0; i < PARTICLE_COUNT; i++) particles.push(makeParticle());
+
+      var hero = document.getElementById('hero');
+      hero.addEventListener('mousemove', function(e) {
+        var rect = hero.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+      hero.addEventListener('mouseleave', function() {
+        mouse.x = -999; mouse.y = -999;
+      });
+
+      // Click to burst
+      hero.addEventListener('click', function(e) {
+        var rect = hero.getBoundingClientRect();
+        var cx = e.clientX - rect.left;
+        var cy = e.clientY - rect.top;
+        for (var b = 0; b < 18; b++) {
+          var angle = (b / 18) * Math.PI * 2;
+          var speed = 2 + Math.random() * 4;
+          bursts.push({
+            x: cx, y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            r: Math.random() * 3 + 1,
+            life: 1,
+            color: colors[Math.floor(Math.random() * colors.length)]
+          });
+        }
+      });
+
+      function drawStar(ctx, x, y, r, color, alpha) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.fillStyle = color;
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        for (var i = 0; i < 5; i++) {
+          var angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+          var outerR = r * 1.8;
+          var innerR = r * 0.7;
+          ctx.lineTo(Math.cos(angle) * outerR, Math.sin(angle) * outerR);
+          var innerAngle = angle + Math.PI / 5;
+          ctx.lineTo(Math.cos(innerAngle) * innerR, Math.sin(innerAngle) * innerR);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function tick() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Update & draw particles
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.vx; p.y += p.vy;
+          p.twinkle += p.twinkleSpeed;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+          // Mouse repulsion (push away when close)
+          var dx = p.x - mouse.x, dy = p.y - mouse.y;
+          var dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 120 && dist > 0) {
+            var force = (120 - dist) / 120 * 1.5;
+            p.vx += (dx / dist) * force * 0.04;
+            p.vy += (dy / dist) * force * 0.04;
+          }
+          // Damping
+          p.vx *= 0.99; p.vy *= 0.99;
+          // Min velocity
+          if (Math.abs(p.vx) < 0.1) p.vx += (Math.random() - 0.5) * 0.1;
+          if (Math.abs(p.vy) < 0.1) p.vy += (Math.random() - 0.5) * 0.1;
+
+          var twinkleAlpha = 0.3 + Math.sin(p.twinkle) * 0.25;
+
+          // Draw particle
+          if (p.isStar) {
+            drawStar(ctx, p.x, p.y, p.r, p.color, twinkleAlpha);
+          } else {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = twinkleAlpha;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+          }
+
+          // Glow for larger particles
+          if (p.r > 1.5) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+            var grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+            grad.addColorStop(0, p.color + '20');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fill();
+          }
+
+          // Connections
+          for (var j = i + 1; j < particles.length; j++) {
+            var p2 = particles[j];
+            var ddx = p.x - p2.x, ddy = p.y - p2.y;
+            var d = Math.sqrt(ddx*ddx + ddy*ddy);
+            if (d < MAX_DIST) {
+              var alpha = (1 - d / MAX_DIST) * 0.12;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = 'rgba(255,93,59,' + alpha + ')';
+              ctx.lineWidth = 0.6;
+              ctx.stroke();
+            }
+          }
+
+          // Connect to mouse
+          if (dist < 150 && dist > 0) {
+            var mAlpha = (1 - dist / 150) * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.strokeStyle = 'rgba(167,139,250,' + mAlpha + ')';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+
+        // Update & draw bursts
+        for (var k = bursts.length - 1; k >= 0; k--) {
+          var b = bursts[k];
+          b.x += b.vx; b.y += b.vy;
+          b.vx *= 0.96; b.vy *= 0.96;
+          b.vy += 0.05; // gravity
+          b.life -= 0.015;
+          if (b.life <= 0) { bursts.splice(k, 1); continue; }
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.r * b.life, 0, Math.PI * 2);
+          ctx.fillStyle = b.color;
+          ctx.globalAlpha = b.life;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    // ===== Global Click Ripple =====
+    (function() {
+      document.addEventListener('click', function(e) {
+        // Skip on form elements
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('.modal-bg')) return;
+        var ripple = document.createElement('div');
+        ripple.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:4px;height:4px;border-radius:50%;border:2px solid rgba(255,93,59,0.5);pointer-events:none;z-index:9996;transform:translate(-50%,-50%);transition:width 0.5s,height 0.5s,opacity 0.5s,border-width 0.5s';
+        document.body.appendChild(ripple);
+        requestAnimationFrame(function() {
+          ripple.style.width = '120px';
+          ripple.style.height = '120px';
+          ripple.style.opacity = '0';
+          ripple.style.borderWidth = '1px';
+        });
+        setTimeout(function() { ripple.remove(); }, 600);
+      });
+    })();
+
+    // ===== Magnetic Hero Title =====
+    (function() {
+      var h1 = document.querySelector('.hero h1');
+      if (!h1) return;
+      var spans = [];
+      // Split text into letter spans
+      h1.querySelectorAll('.em, br').forEach(function(el) { el.remove(); });
+      var lines = ['基于 Agentic AI', '的互动课堂'];
+      h1.innerHTML = '';
+      lines.forEach(function(line, li) {
+        var lineDiv = document.createElement('div');
+        for (var i = 0; i < line.length; i++) {
+          var span = document.createElement('span');
+          span.textContent = line[i];
+          span.style.cssText = 'display:inline-block;transition:transform 0.15s ease, color 0.2s;will-change:transform';
+          if (li === 1 && i >= 1) {
+            span.style.background = 'linear-gradient(135deg, var(--accent), #ff8a6c)';
+            span.style.webkitBackgroundClip = 'text';
+            span.style.webkitTextFillColor = 'transparent';
+            span.style.backgroundClip = 'text';
+          }
+          lineDiv.appendChild(span);
+          spans.push(span);
+        }
+        h1.appendChild(lineDiv);
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        var h1Rect = h1.getBoundingClientRect();
+        // Only apply when mouse is near the h1 area
+        if (e.clientY < h1Rect.top - 100 || e.clientY > h1Rect.bottom + 100) {
+          spans.forEach(function(s) { s.style.transform = 'translate(0,0)'; });
+          return;
+        }
+        spans.forEach(function(span) {
+          var r = span.getBoundingClientRect();
+          var cx = r.left + r.width / 2;
+          var cy = r.top + r.height / 2;
+          var dx = e.clientX - cx;
+          var dy = e.clientY - cy;
+          var dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 100) {
+            var force = (100 - dist) / 100;
+            span.style.transform = 'translate(' + (-dx * force * 0.3) + 'px, ' + (-dy * force * 0.3) + 'px) scale(' + (1 + force * 0.15) + ')';
+          } else {
+            span.style.transform = 'translate(0,0) scale(1)';
+          }
+        });
+      });
+    })();
+
+    // ===== Animated Number Counters =====
+    var counterTriggered = false;
+    function animateCounters() {
+      if (counterTriggered) return;
+      counterTriggered = true;
+      document.querySelectorAll('[data-count]').forEach(function(el) {
+        var target = parseInt(el.dataset.count);
+        var unit = el.querySelector('.unit');
+        var unitHTML = unit ? unit.outerHTML : '';
+        var current = 0;
+        var duration = 1200;
+        var startTime = performance.now();
+        function tick(now) {
+          var elapsed = now - startTime;
+          var progress = Math.min(elapsed / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          current = Math.round(target * eased);
+          el.innerHTML = current + unitHTML;
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      });
+    }
+    // Trigger after a short delay on load
+    setTimeout(animateCounters, 600);
+
+    // ===== Function Plotter =====
+    (function() {
+      var canvas = document.getElementById('plotterCanvas');
+      var ctx = canvas.getContext('2d');
+      var ampSlider = document.getElementById('ampSlider');
+      var freqSlider = document.getElementById('freqSlider');
+      var phaseSlider = document.getElementById('phaseSlider');
+      var ampVal = document.getElementById('ampVal');
+      var freqVal = document.getElementById('freqVal');
+      var phaseVal = document.getElementById('phaseVal');
+      var currentFn = 'sin';
+
+      function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 220;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function plot() {
+        var A = parseFloat(ampSlider.value);
+        var w = parseFloat(freqSlider.value);
+        var phi = parseFloat(phaseSlider.value);
+        ampVal.textContent = A.toFixed(1);
+        freqVal.textContent = w.toFixed(1);
+        phaseVal.textContent = phi.toFixed(1);
+
+        var W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        // Grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        for (var gx = 0; gx < W; gx += 30) {
+          ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke();
+        }
+        for (var gy = 0; gy < H; gy += 30) {
+          ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H); ctx.stroke();
+
+        // Axis labels
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.font = '10px JetBrains Mono';
+        ctx.fillText('0', W/2 + 4, H/2 + 12);
+
+        // Plot function
+        var fn;
+        if (currentFn === 'sin') fn = Math.sin;
+        else if (currentFn === 'cos') fn = Math.cos;
+        else fn = Math.tan;
+
+        var scale = H / 3.5;
+        var xMin = -6.28, xMax = 6.28;
+
+        ctx.strokeStyle = '#ff5d3b';
+        ctx.lineWidth = 2;
+        ctx.shadowColor = 'rgba(255,93,59,0.4)';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+
+        var first = true;
+        for (var px = 0; px < W; px++) {
+          var x = xMin + (px / W) * (xMax - xMin);
+          var y;
+          if (currentFn === 'tan') {
+            var tv = A * fn(w * x + phi);
+            if (Math.abs(tv) > 5) { first = true; continue; }
+            y = tv;
+          } else {
+            y = A * fn(w * x + phi);
+          }
+          var py = H/2 - y * scale;
+          if (first) { ctx.moveTo(px, py); first = false; }
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Labels
+        ctx.fillStyle = 'rgba(255,93,59,0.6)';
+        ctx.font = '11px JetBrains Mono';
+        var label = 'y = ' + A.toFixed(1) + '\u00b7' + currentFn + '(' + w.toFixed(1) + 'x';
+        if (phi > 0) label += '+' + phi.toFixed(1);
+        label += ')';
+        ctx.fillText(label, 10, 16);
+      }
+
+      window.switchFn = function(fn) {
+        currentFn = fn;
+        document.querySelectorAll('.fn-tab').forEach(function(t) {
+          t.classList.toggle('active', t.dataset.fn === fn);
+        });
+        plot();
+      };
+
+      [ampSlider, freqSlider, phaseSlider].forEach(function(s) {
+        s.addEventListener('input', plot);
+      });
+
+      plot();
+    })();
+
+    // ===== AI Chat Auto-Typing Demo =====
+    (function() {
+      var chatBox = document.getElementById('chatDemo');
+      var script = [
+        { role: 'user', text: '求极限 lim(x\u21920) sin(x)/x' },
+        { role: 'ai', text: '这是经典的 \u7b2c\u4e00\u7c7b\u91cd\u8981\u6781\u9650\u3002\u5229\u7528\u6cf0\u52d2\u5c55\u5f00\uff1a\n\nsin(x) = x \u2212 x\u00b3/3! + x\u2075/5! \u2212 ...\n\n\u6240\u4ee5 sin(x)/x = 1 \u2212 x\u00b2/3! + x\u2074/5! \u2212 ...\n\n\u5f53 x\u2192 \u65f6\uff0c\u9ad8\u9636\u9879\u8d8b\u4e8e0\uff0c\u6240\u4ee5\u6781\u9650 = 1\u3002' },
+        { role: 'user', text: '洛必达法则也行吗？' },
+        { role: 'ai', text: '\u53ef\u4ee5\uff01sin(x)/x \u662f 0/0 \u578b\u672a\u5b9a\u5f0f\u3002\n\n\u5206\u5b50\u5206\u6bcd\u5404\u81ea\u6c42\u5bfc\uff1a\n\u00b7 d/dx[sin(x)] = cos(x)\n\u00b7 d/dx[x] = 1\n\n\u6240\u4ee5 lim = cos(0)/1 = 1 \u2705\n\n\u4e24\u79cd\u65b9\u6cd5\u7ed3\u679c\u4e00\u81f4\uff0c\u4e92\u76f8\u9a8c\u8bc1\u3002' },
+        { role: 'user', text: '那 lim(x\u2192\u221e) (1+1/x)\u02e3 呢？' },
+        { role: 'ai', text: '\u8fd9\u662f\u7b2c\u4e8c\u7c7b\u91cd\u8981\u6781\u9650\uff0c\u7ed3\u679c\u662f e\u3002\n\n\u5173\u952e\u601d\u8def\uff1a\u4ee4 t = 1/x\uff0c\u5f53 x\u2192\u221e \u65f6 t\u21920\uff0c\n\u5316\u4e3a lim(t\u21920) (1+t)^(1/t) = e\u3002\n\n\u8fd9\u4e2a e \u2248 2.71828 \u662f\u81ea\u7136\u5bf9\u6570\u7684\u5e95\u6570\u3002' }
+      ];
+      var idx = 0;
+      var chatTimer = null;
+
+      function addMsg(role, text, withCursor) {
+        var div = document.createElement('div');
+        div.className = 'chat-msg ' + role;
+        var label = document.createElement('div');
+        label.className = 'chat-label';
+        label.textContent = role === 'user' ? 'YOU' : 'AI \u8f85\u5bfc';
+        div.appendChild(label);
+        var body = document.createElement('div');
+        body.className = 'chat-body';
+        body.style.whiteSpace = 'pre-wrap';
+        div.appendChild(body);
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (withCursor && role === 'ai') {
+          var cursor = document.createElement('span');
+          cursor.className = 'typing-cursor';
+          body.appendChild(cursor);
+          var charIdx = 0;
+          function typeNext() {
+            if (charIdx < text.length) {
+              body.textContent = text.substring(0, charIdx + 1);
+              body.appendChild(cursor);
+              chatBox.scrollTop = chatBox.scrollHeight;
+              charIdx++;
+              chatTimer = setTimeout(typeNext, 25 + Math.random() * 30);
+            } else {
+              cursor.remove();
+              chatTimer = setTimeout(nextMsg, 800);
+            }
+          }
+          typeNext();
+        } else {
+          body.textContent = text;
+          chatTimer = setTimeout(nextMsg, 800);
+        }
+      }
+
+      function nextMsg() {
+        if (idx >= script.length) {
+          // Loop after delay
+          chatTimer = setTimeout(function() {
+            chatBox.innerHTML = '';
+            idx = 0;
+            nextMsg();
+          }, 4000);
+          return;
+        }
+        var msg = script[idx];
+        idx++;
+        addMsg(msg.role, msg.text, msg.role === 'ai');
+      }
+
+      window.restartChat = function() {
+        if (chatTimer) clearTimeout(chatTimer);
+        chatBox.innerHTML = '';
+        idx = 0;
+        nextMsg();
+      };
+
+      // Start when demo section is visible
+      var demoObserver = new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) {
+          nextMsg();
+          demoObserver.disconnect();
+        }
+      }, { threshold: 0.3 });
+      demoObserver.observe(document.getElementById('demo'));
+    })();
+
+    // ===== Physics Ball Sandbox =====
+    (function() {
+      var canvas = document.getElementById('physicsCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      var balls = [];
+      var gravity = true;
+      var dragging = null;
+      var dragOffset = { x: 0, y: 0 };
+      var lastMouse = { x: 0, y: 0, t: 0 };
+      var mouseVel = { x: 0, y: 0 };
+      var colors = ['#ff5d3b', '#a78bfa', '#22d3ee', '#34d399', '#fbbf24', '#ec4899'];
+
+      function resize() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 200;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function makeBall(x, y, r) {
+        return {
+          x: x || Math.random() * canvas.width,
+          y: y || Math.random() * 100,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4,
+          r: r || 10 + Math.random() * 14,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          mass: 1
+        };
+      }
+
+      // Initial balls
+      for (var i = 0; i < 5; i++) balls.push(makeBall());
+
+      function physicsStep() {
+        var W = canvas.width, H = canvas.height;
+        for (var i = 0; i < balls.length; i++) {
+          var b = balls[i];
+          if (b === dragging) continue;
+          if (gravity) b.vy += 0.25;
+          b.x += b.vx; b.y += b.vy;
+          // Walls
+          if (b.x - b.r < 0) { b.x = b.r; b.vx *= -0.7; }
+          if (b.x + b.r > W) { b.x = W - b.r; b.vx *= -0.7; }
+          if (b.y - b.r < 0) { b.y = b.r; b.vy *= -0.7; }
+          if (b.y + b.r > H) { b.y = H - b.r; b.vy *= -0.65; b.vx *= 0.96; }
+          // Air friction
+          b.vx *= 0.998; b.vy *= 0.999;
+        }
+        // Ball-ball collision
+        for (var i = 0; i < balls.length; i++) {
+          for (var j = i + 1; j < balls.length; j++) {
+            var a = balls[i], b = balls[j];
+            var dx = b.x - a.x, dy = b.y - a.y;
+            var dist = Math.sqrt(dx*dx + dy*dy);
+            var minDist = a.r + b.r;
+            if (dist < minDist && dist > 0) {
+              var overlap = (minDist - dist) / 2;
+              var nx = dx / dist, ny = dy / dist;
+              a.x -= nx * overlap; a.y -= ny * overlap;
+              b.x += nx * overlap; b.y += ny * overlap;
+              // Elastic collision
+              var dvx = b.vx - a.vx, dvy = b.vy - a.vy;
+              var dot = dvx * nx + dvy * ny;
+              if (dot < 0) {
+                var impulse = dot * 0.8;
+                a.vx += impulse * nx; a.vy += impulse * ny;
+                b.vx -= impulse * nx; b.vy -= impulse * ny;
+              }
+            }
+          }
+        }
+      }
+
+      function draw() {
+        var W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+        // Grid bg
+        ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+        ctx.lineWidth = 1;
+        for (var gx = 0; gx < W; gx += 25) { ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, H); ctx.stroke(); }
+        for (var gy = 0; gy < H; gy += 25) { ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(W, gy); ctx.stroke(); }
+
+        for (var i = 0; i < balls.length; i++) {
+          var b = balls[i];
+          // Glow
+          var grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r * 2.5);
+          grad.addColorStop(0, b.color + '30');
+          grad.addColorStop(1, 'transparent');
+          ctx.fillStyle = grad;
+          ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 2.5, 0, Math.PI * 2); ctx.fill();
+          // Ball
+          ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.fillStyle = b.color; ctx.fill();
+          // Highlight
+          ctx.beginPath(); ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.3, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fill();
+          // Border
+          ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(255,255,255,0.15)'; ctx.lineWidth = 1; ctx.stroke();
+        }
+
+        // Drag line
+        if (dragging) {
+          ctx.beginPath();
+          ctx.moveTo(dragging.x, dragging.y);
+          ctx.lineTo(dragging.x - mouseVel.x * 3, dragging.y - mouseVel.y * 3);
+          ctx.strokeStyle = 'rgba(255,93,59,0.4)';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+
+      function loop() { physicsStep(); draw(); requestAnimationFrame(loop); }
+      loop();
+
+      // Mouse interactions
+      canvas.addEventListener('mousedown', function(e) {
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left;
+        var my = e.clientY - rect.top;
+        for (var i = balls.length - 1; i >= 0; i--) {
+          var b = balls[i];
+          var dx = mx - b.x, dy = my - b.y;
+          if (Math.sqrt(dx*dx + dy*dy) < b.r) {
+            dragging = b;
+            dragOffset.x = dx; dragOffset.y = dy;
+            lastMouse = { x: mx, y: my, t: performance.now() };
+            return;
+          }
+        }
+        // Click empty space: add ball
+        var newBall = makeBall(mx, my, 8 + Math.random() * 16);
+        newBall.vx = 0; newBall.vy = 0;
+        balls.push(newBall);
+        if (balls.length > 30) balls.shift();
+      });
+
+      canvas.addEventListener('mousemove', function(e) {
+        if (!dragging) return;
+        var rect = canvas.getBoundingClientRect();
+        var mx = e.clientX - rect.left;
+        var my = e.clientY - rect.top;
+        var now = performance.now();
+        var dt = Math.max(now - lastMouse.t, 1);
+        mouseVel.x = (mx - lastMouse.x) / dt * 16;
+        mouseVel.y = (my - lastMouse.y) / dt * 16;
+        dragging.x = mx - dragOffset.x;
+        dragging.y = my - dragOffset.y;
+        dragging.vx = 0; dragging.vy = 0;
+        lastMouse = { x: mx, y: my, t: now };
+      });
+
+      canvas.addEventListener('mouseup', function() {
+        if (dragging) {
+          dragging.vx = mouseVel.x;
+          dragging.vy = mouseVel.y;
+          dragging = null;
+        }
+      });
+      canvas.addEventListener('mouseleave', function() {
+        if (dragging) {
+          dragging.vx = mouseVel.x * 0.5;
+          dragging.vy = mouseVel.y * 0.5;
+          dragging = null;
+        }
+      });
+
+      // Touch support
+      canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        var touch = e.touches[0];
+        var rect = canvas.getBoundingClientRect();
+        var mx = touch.clientX - rect.left;
+        var my = touch.clientY - rect.top;
+        for (var i = balls.length - 1; i >= 0; i--) {
+          var b = balls[i];
+          var dx = mx - b.x, dy = my - b.y;
+          if (Math.sqrt(dx*dx + dy*dy) < b.r) {
+            dragging = b; dragOffset = { x: dx, y: dy };
+            lastMouse = { x: mx, y: my, t: performance.now() };
+            return;
+          }
+        }
+        balls.push(makeBall(mx, my, 8 + Math.random() * 16));
+        if (balls.length > 30) balls.shift();
+      }, { passive: false });
+      canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        if (!dragging) return;
+        var touch = e.touches[0];
+        var rect = canvas.getBoundingClientRect();
+        var mx = touch.clientX - rect.left;
+        var my = touch.clientY - rect.top;
+        var now = performance.now();
+        var dt = Math.max(now - lastMouse.t, 1);
+        mouseVel.x = (mx - lastMouse.x) / dt * 16;
+        mouseVel.y = (my - lastMouse.y) / dt * 16;
+        dragging.x = mx - dragOffset.x; dragging.y = my - dragOffset.y;
+        dragging.vx = 0; dragging.vy = 0;
+        lastMouse = { x: mx, y: my, t: now };
+      }, { passive: false });
+      canvas.addEventListener('touchend', function() {
+        if (dragging) { dragging.vx = mouseVel.x; dragging.vy = mouseVel.y; dragging = null; }
+      });
+
+      // Global controls
+      window.addBall = function() { balls.push(makeBall()); if (balls.length > 30) balls.shift(); };
+      window.toggleGravity = function() { gravity = !gravity; };
+      window.clearBalls = function() { balls = []; };
+      window.explodeBalls = function() {
+        var cx = canvas.width / 2, cy = canvas.height / 2;
+        balls.forEach(function(b) {
+          var dx = b.x - cx, dy = b.y - cy;
+          var d = Math.sqrt(dx*dx + dy*dy) || 1;
+          b.vx += (dx / d) * 15;
+          b.vy += (dy / d) * 15 - 5;
+        });
+      };
+    })();
+  </script>
+</body>
+</html>

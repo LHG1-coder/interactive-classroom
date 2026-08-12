@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成就系统 · 互动课堂</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg: #0c0c0f; --panel: #141418; --card: #1a1a20;
+    --border: rgba(255,255,255,0.06); --accent: #ff5d3b;
+    --text: #f5f5f7; --text2: #9a9aa6; --text3: #56565f;
+    --green: #34d399; --amber: #fbbf24; --purple: #a78bfa;
+  }
+  body {
+    font-family: 'Inter','Noto Sans SC',-apple-system,sans-serif;
+    background: var(--bg); color: var(--text); min-height:100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(180deg, rgba(255,93,59,0.06) 0%, transparent 100%);
+    padding: 36px 48px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: flex-end; gap: 40px;
+    flex-wrap: wrap;
+  }
+  .header-title h1 {
+    font-size: 26px; font-weight: 700; letter-spacing: -0.02em;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .header-title h1 span.gradient {
+    background: linear-gradient(135deg, var(--accent), var(--amber));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .header-title .sub {
+    font-size: 12px; color: var(--text3); letter-spacing: 1px; margin-top: 4px;
+  }
+  .stats-row { display: flex; gap: 36px; margin-left: auto; }
+  .stat { text-align: center; min-width: 80px; }
+  .stat .num { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
+  .stat .label { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+  .stat .bar-wrap { width: 90px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin: 8px auto 0; overflow: hidden; }
+  .stat .bar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.6s; }
+
+  /* Container */
+  .container { max-width: 1040px; margin: 0 auto; padding: 28px 40px; }
+
+  /* Category */
+  .cat-header {
+    display: flex; align-items: center; gap: 12px;
+    margin: 32px 0 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-header .cat-icon { font-size: 18px; }
+  .cat-header .cat-name {
+    font-size: 13px; font-weight: 600; letter-spacing: 1px; color: var(--text2); text-transform: uppercase;
+  }
+  .cat-header .cat-count {
+    font-size: 11px; color: var(--text3); margin-left: auto;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 10px;
+  }
+
+  /* Achievement card */
+  .ach {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px;
+    transition: all 0.25s;
+  }
+  .ach:hover {
+    background: #1e1e26;
+    border-color: rgba(255,255,255,0.12);
+    transform: translateY(-1px);
+  }
+  .ach.locked { opacity: 0.45; }
+  .ach.locked:hover { opacity: 0.6; }
+
+  /* Icon */
+  .ach-icon {
+    width: 48px; height: 48px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0; position: relative;
+  }
+  .ach.locked .ach-icon { filter: grayscale(1) brightness(0.6); }
+  .ach-icon.legendary { background: linear-gradient(135deg, #cfb53b, #8b6914); box-shadow: 0 0 16px rgba(207,181,59,0.2); }
+  .ach-icon.epic { background: linear-gradient(135deg, #7b2fbe, #4a148c); box-shadow: 0 0 12px rgba(123,47,190,0.2); }
+  .ach-icon.rare { background: linear-gradient(135deg, #2196F3, #0d47a1); box-shadow: 0 0 10px rgba(33,150,243,0.15); }
+  .ach-icon.common { background: linear-gradient(135deg, #4caf50, #1b5e20); }
+  .ach.unlocked .ach-icon { animation: achPulse 2s ease-in-out; }
+  @keyframes achPulse {
+    0% { transform: scale(1); } 30% { transform: scale(1.15); } 60% { transform: scale(0.95); } 100% { transform: scale(1); }
+  }
+
+  /* Info */
+  .ach-info { flex: 1; min-width: 0; }
+  .ach-info h3 { font-size: 12.5px; font-weight: 600; margin-bottom: 2px; }
+  .ach.locked .ach-info h3 { color: var(--text3); }
+  .ach-info p { font-size: 11px; color: var(--text3); line-height: 1.4; }
+  .ach-info .progress-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .ach-info .pbar { flex:1; height: 3px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+  .ach-info .pbar-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s; }
+  .ach-info .pval { font-size: 10px; color: var(--accent); white-space: nowrap; }
+  .ach-date { font-size: 10px; color: var(--accent); margin-top: 3px; opacity: 0.7; }
+
+  /* Rarity badge */
+  .rarity-badge {
+    display: inline-block; font-size: 9px; padding: 1px 7px; border-radius: 3px;
+    letter-spacing: 0.5px; font-weight: 600; margin-left: 6px;
+  }
+  .rarity-badge.legendary { background: rgba(207,181,59,0.15); color: #cfb53b; }
+  .rarity-badge.epic { background: rgba(123,47,190,0.15); color: #a78bfa; }
+  .rarity-badge.rare { background: rgba(33,150,243,0.15); color: #60a5fa; }
+  .rarity-badge.common { background: rgba(76,175,80,0.15); color: #4ade80; }
+  .rarity-badge.secret { background: rgba(255,93,59,0.15); color: var(--accent); }
+
+  /* Toast */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+  .toast {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 16px 18px;
+    display: flex; align-items: center; gap: 12px;
+    min-width: 300px; max-width: 380px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    animation: toastIn 0.4s ease-out, toastOut 0.3s ease-in 4.5s forwards;
+  }
+  @keyframes toastIn { from { opacity:0; transform: translateX(60px); } to { opacity:1; transform: translateX(0); } }
+  @keyframes toastOut { from { opacity:1; } to { opacity:0; transform: translateY(-20px); } }
+  .toast-icon {
+    width: 42px; height: 42px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .toast-icon.legendary { background: linear-gradient(135deg, #cfb53b, #8b6914); }
+  .toast-icon.epic { background: linear-gradient(135deg, #7b2fbe, #4a148c); }
+  .toast-icon.rare { background: linear-gradient(135deg, #2196F3, #0d47a1); }
+  .toast-icon.common { background: linear-gradient(135deg, #4caf50, #1b5e20); }
+  .toast-body h4 { font-size: 12px; color: var(--accent); }
+  .toast-body p { font-size: 13px; font-weight: 600; margin-top: 2px; }
+  .toast-body .rarity-text { font-size: 10px; color: var(--text3); margin-top: 2px; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex; gap: 8px; padding: 0 40px; margin-top: 20px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);
+    background: transparent; color: var(--text2); font-size: 12px; cursor: pointer;
+    font-family: inherit; transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-btn .count { color: var(--text3); font-size: 10px; margin-left: 4px; }
+
+  /* Recent unlocks section */
+  .recent-section { margin-top: 40px; }
+  .recent-section h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .recent-list { display: flex; gap: 14px; flex-wrap: wrap; }
+  .recent-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 24px; padding: 8px 16px 8px 8px;
+    font-size: 12px;
+  }
+  .recent-chip .mini-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .recent-chip .mini-icon.legendary { background: linear-gradient(135deg, #cfb53b, #8b6914); }
+  .recent-chip .mini-icon.epic { background: linear-gradient(135deg, #7b2fbe, #4a148c); }
+  .recent-chip .mini-icon.rare { background: linear-gradient(135deg, #2196F3, #0d47a1); }
+  .recent-chip .mini-icon.common { background: linear-gradient(135deg, #4caf50, #1b5e20); }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed; z-index: 9998; pointer-events: none;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  @media (max-width: 768px) {
+    .header { padding: 24px 20px 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+    .stats-row { margin-left: 0; }
+    .container { padding: 20px 16px; }
+    .grid { grid-template-columns: 1fr; }
+    .filter-bar { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-title">
+    <h1>🏆 <span class="gradient">成就系统</span></h1>
+    <p class="sub">完成挑战，解锁成就，记录你的学习足迹</p>
+  </div>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="num" id="unlockedCount" style="color:#34d399">0</div>
+      <div class="label">已解锁</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="totalCount">30</div>
+      <div class="label">总成就</div>
+    </div>
+    <div class="stat">
+      <div class="num" id="perfectPercent" style="color:#ff5d3b">0<small style="font-size:18px">%</small></div>
+      <div class="label">完成率</div>
+      <div class="bar-wrap"><div class="bar-fill" id="perfectBar" style="width:0%"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar" id="filterBar"></div>
+<div class="container" id="achievementGrid"></div>
+
+<div class="container recent-section" id="recentSection">
+  <h2>🕐 最近解锁</h2>
+  <div class="recent-list" id="recentList"><span style="color:var(--text3);font-size:13px">还没有解锁任何成就，快去学习吧！</span></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ===================== ACHIEVEMENT DATA =====================
+const achievements = [
+  // ── 入门 6 ──
+  { id:'first_lesson', name:'第一步', desc:'完成第一节课', icon:'🎓', rarity:'common', cat:'入门', cond:{lessons:1} },
+  { id:'three_courses', name:'学科探索者', desc:'浏览过全部三门课程', icon:'🗺️', rarity:'common', cat:'入门', cond:{courses:3} },
+  { id:'daily_streak_3', name:'三日热度', desc:'连续 3 天登录学习', icon:'🔥', rarity:'common', cat:'入门', cond:{streak:3} },
+  { id:'ten_lessons', name:'十课达人', desc:'完成 10 节课程', icon:'📚', rarity:'rare', cat:'入门', cond:{lessons:10} },
+  { id:'fifty_lessons', name:'学海无涯', desc:'完成 50 节课程', icon:'🌊', rarity:'epic', cat:'入门', cond:{lessons:50} },
+  { id:'hundred_lessons', name:'终身学习者', desc:'完成 100 节课程', icon:'🏛️', rarity:'legendary', cat:'入门', cond:{lessons:100} },
+
+  // ── 刷题 7 ──
+  { id:'first_quiz', name:'初试锋芒', desc:'完成第一道习题', icon:'✏️', rarity:'common', cat:'刷题', cond:{exercises:1} },
+  { id:'perfect_quiz', name:'满分答卷', desc:'单次练习获得 100% 正确率', icon:'💯', rarity:'rare', cat:'刷题', cond:{perfect:1} },
+  { id:'fifty_exercises', name:'刷题机器', desc:'累计完成 50 道习题', icon:'⚙️', rarity:'rare', cat:'刷题', cond:{exercises:50} },
+  { id:'speed_demon', name:'闪电思维', desc:'3 分钟内完成 10 道题且正确率 ≥90%', icon:'⚡', rarity:'epic', cat:'刷题', cond:{speed_run:true} },
+  { id:'no_mistakes', name:'滴水不漏', desc:'连续 20 道题无错误', icon:'🛡️', rarity:'epic', cat:'刷题', cond:{streak_correct:20} },
+  { id:'hundred_exercises', name:'题海战术', desc:'累计完成 100 道习题', icon:'🎯', rarity:'epic', cat:'刷题', cond:{exercises:100} },
+  { id:'all_perfect', name:'完美主义者', desc:'所有做过题的平均正确率 ≥95%（至少50道题）', icon:'💎', rarity:'legendary', cat:'刷题', cond:{avg_acc:95} },
+
+  // ── 编程 5 ──
+  { id:'first_code', name:'Hello World', desc:'运行第一段代码', icon:'💻', rarity:'common', cat:'编程', cond:{code_runs:1} },
+  { id:'debug_master', name:'调试大师', desc:'成功修复 10 个编译/运行错误', icon:'🔧', rarity:'rare', cat:'编程', cond:{bugs_fixed:10} },
+  { id:'three_langs', name:'多面手', desc:'使用过全部 3 种编程语言（C/C++/Python）', icon:'🌐', rarity:'rare', cat:'编程', cond:{langs:3} },
+  { id:'code_marathon', name:'代码马拉松', desc:'单次 Coding Lab 编写超过 100 行代码', icon:'🏃', rarity:'epic', cat:'编程', cond:{code_lines:100} },
+  { id:'no_compile_errors', name:'一气呵成', desc:'连续 5 次运行无编译错误', icon:'✨', rarity:'epic', cat:'编程', cond:{no_errors:5} },
+
+  // ── 探索 6 ──
+  { id:'viz_master', name:'可视化鉴赏家', desc:'使用过全部 15 种高数可视化', icon:'📊', rarity:'rare', cat:'探索', cond:{viz_used:15} },
+  { id:'ds_viz', name:'指针猎人', desc:'完成一次带内存可视化的数据结构编程', icon:'🔗', rarity:'rare', cat:'探索', cond:{ds_viz:1} },
+  { id:'deep_dive', name:'深潜者', desc:'单日学习时长达 3 小时', icon:'⏱️', rarity:'epic', cat:'探索', cond:{daily_time:180} },
+  { id:'night_owl', name:'夜猫子勋章', desc:'在 23:00-5:00 期间完成过一节课程', icon:'🦉', rarity:'rare', cat:'探索', cond:{night_study:true} },
+  { id:'weekend_warrior', name:'周末战士', desc:'周六或周日完成 5 节以上课程', icon:'⚔️', rarity:'rare', cat:'探索', cond:{weekend:5} },
+  { id:'all_courses_complete', name:'全通者', desc:'完成全部课程的所有章节', icon:'👑', rarity:'legendary', cat:'探索', cond:{all_complete:true} },
+
+  // ── 隐藏 4 ──
+  { id:'easter_egg', name:'这就是答案', desc:'在搜索框输入 42', icon:'🥚', rarity:'legendary', cat:'隐藏', cond:{secret_42:true} },
+  { id:'konami', name:'↑↑↓↓←→←→BA', desc:'使用 Konami Code 解锁', icon:'🎮', rarity:'legendary', cat:'隐藏', cond:{konami:true} },
+  { id:'all_legendary', name:'传说收藏家', desc:'集齐全部传说级成就', icon:'🌟', rarity:'legendary', cat:'隐藏', cond:{all_legendary:true} },
+  { id:'py_course', name:'蛇之学徒', desc:'完成 Python 程序设计课程的全部章节', icon:'🐍', rarity:'epic', cat:'编程', cond:{py_complete:true} },
+];
+
+// ===================== STATE =====================
+const STORAGE_KEY = 'ach_data_v3';
+let state = loadState();
+
+function defaultState() {
+  return {
+    lessons:0, courses:0, exercises:0, perfect:0, streak:0,
+    lastLogin:'', streak_correct:0, max_streak_correct:0,
+    code_runs:0, bugs_fixed:0, langs:[],
+    code_lines:0, no_errors:0,
+    viz_used:0, ds_viz:0, daily_time:0,
+    night_study:false, weekend:0, avg_acc:0, total_acc_sum:0,
+    speed_run:false, all_complete:false, py_complete:false,
+    secret_42:false, konami:false,
+    unlocked:{}, unlockedDates:{}, all_legendary:false,
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) { const s = JSON.parse(raw); s.langs = s.langs || []; return s; }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  const toSave = { ...state, langs: state.langs };
+  toSave.lastLogin = new Date().toISOString().split('T')[0];
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+}
+
+// ===================== CHECK =====================
+function checkAchievement(id) {
+  const ach = achievements.find(a => a.id === id);
+  if (!ach || state.unlocked[id]) return;
+
+  const c = ach.cond;
+  let earned = false;
+  if (c.lessons !== undefined && state.lessons >= c.lessons) earned = true;
+  if (c.courses !== undefined && state.courses >= c.courses) earned = true;
+  if (c.streak !== undefined && state.streak >= c.streak) earned = true;
+  if (c.exercises !== undefined && state.exercises >= c.exercises) earned = true;
+  if (c.perfect !== undefined && state.perfect >= c.perfect) earned = true;
+  if (c.speed_run !== undefined && state.speed_run) earned = true;
+  if (c.streak_correct !== undefined && state.max_streak_correct >= c.streak_correct) earned = true;
+  if (c.avg_acc !== undefined && state.exercises >= 50 && (state.total_acc_sum/state.exercises) >= c.avg_acc) earned = true;
+  if (c.code_runs !== undefined && state.code_runs >= c.code_runs) earned = true;
+  if (c.bugs_fixed !== undefined && state.bugs_fixed >= c.bugs_fixed) earned = true;
+  if (c.langs !== undefined && state.langs.length >= c.langs) earned = true;
+  if (c.code_lines !== undefined && state.code_lines >= c.code_lines) earned = true;
+  if (c.no_errors !== undefined && state.no_errors >= c.no_errors) earned = true;
+  if (c.viz_used !== undefined && state.viz_used >= c.viz_used) earned = true;
+  if (c.ds_viz !== undefined && state.ds_viz >= c.ds_viz) earned = true;
+  if (c.daily_time !== undefined && state.daily_time >= c.daily_time) earned = true;
+  if (c.night_study !== undefined && state.night_study) earned = true;
+  if (c.weekend !== undefined && state.weekend >= c.weekend) earned = true;
+  if (c.secret_42 !== undefined && state.secret_42) earned = true;
+  if (c.konami !== undefined && state.konami) earned = true;
+  if (c.all_complete !== undefined && state.all_complete) earned = true;
+  if (c.all_legendary !== undefined && state.all_legendary) earned = true;
+  if (c.py_complete !== undefined && state.py_complete) earned = true;
+
+  if (earned) {
+    state.unlocked[id] = true;
+    state.unlockedDates[id] = new Date().toISOString().split('T')[0];
+    saveState();
+    render();
+    showToast(ach);
+    if (ach.rarity === 'legendary') spawnConfetti();
+  }
+}
+
+function checkAll() {
+  achievements.forEach(a => checkAchievement(a.id));
+  // Check all_legendary
+  const legendaryIds = achievements.filter(a => a.rarity === 'legendary').map(a => a.id);
+  if (legendaryIds.every(id => state.unlocked[id])) state.all_legendary = true;
+  checkAchievement('all_legendary');
+}
+
+// ===================== RENDER =====================
+let currentFilter = 'all';
+
+function render() {
+  const grid = document.getElementById('achievementGrid');
+  const cats = ['入门', '刷题', '编程', '探索', '隐藏'];
+  const total = achievements.length;
+  const unlocked = Object.keys(state.unlocked).length;
+
+  // Filter bar
+  const filterBar = document.getElementById('filterBar');
+  let fhtml = `<button class="filter-btn ${currentFilter==='all'?'active':''}" onclick="setFilter('all')">全部<span class="count">${unlocked}/${total}</span></button>`;
+  cats.forEach(cat => {
+    const catAchs = achievements.filter(a => a.cat === cat);
+    const catUnlocked = catAchs.filter(a => state.unlocked[a.id]).length;
+    fhtml += `<button class="filter-btn ${currentFilter===cat?'active':''}" onclick="setFilter('${cat}')">${cat}<span class="count">${catUnlocked}/${catAchs.length}</span></button>`;
+  });
+  fhtml += `<button class="filter-btn ${currentFilter==='unlocked'?'active':''}" onclick="setFilter('unlocked')">已解锁<span class="count">${unlocked}</span></button>`;
+  fhtml += `<button class="filter-btn ${currentFilter==='locked'?'active':''}" onclick="setFilter('locked')">未解锁<span class="count">${total-unlocked}</span></button>`;
+  filterBar.innerHTML = fhtml;
+
+  // Achievement grid
+  let html = '';
+  const displayCats = currentFilter === 'all' || currentFilter === 'unlocked' || currentFilter === 'locked' ? cats : [currentFilter];
+
+  for (const cat of displayCats) {
+    let catAchs = achievements.filter(a => a.cat === cat);
+    if (currentFilter === 'unlocked') catAchs = catAchs.filter(a => state.unlocked[a.id]);
+    if (currentFilter === 'locked') catAchs = catAchs.filter(a => !state.unlocked[a.id]);
+    if (catAchs.length === 0) continue;
+
+    const unlockedInCat = catAchs.filter(a => state.unlocked[a.id]).length;
+    html += `<div class="cat-header"><span class="cat-icon">${cat==='入门'?'🚀':cat==='刷题'?'⚡':cat==='编程'?'💻':cat==='探索'?'🧭':'🔮'}</span><span class="cat-name">${cat}</span><span class="cat-count">${unlockedInCat}/${catAchs.length}</span></div>`;
+    html += '<div class="grid">';
+
+    for (const ach of catAchs) {
+      const isUnlocked = state.unlocked[ach.id];
+      const hidden = cat === '隐藏' && !isUnlocked;
+      const cls = isUnlocked ? 'unlocked' : 'locked';
+
+      let progress = 0, progressText = '';
+      const c = ach.cond;
+      const progPairs = [
+        ['lessons', state.lessons], ['courses', state.courses], ['streak', state.streak],
+        ['exercises', state.exercises], ['streak_correct', state.max_streak_correct],
+        ['code_runs', state.code_runs], ['bugs_fixed', state.bugs_fixed],
+        ['langs', state.langs.length], ['code_lines', state.code_lines],
+        ['viz_used', state.viz_used], ['no_errors', state.no_errors], ['weekend', state.weekend],
+      ];
+      for (const [key, val] of progPairs) {
+        if (c[key] !== undefined) {
+          progress = Math.min(100, val / c[key] * 100);
+          progressText = `${val}/${c[key]}`;
+          break;
+        }
+      }
+      if (progress === 0 && isUnlocked) { progress = 100; progressText = '✓'; }
+
+      const title = hidden ? '???' : ach.name;
+      const desc = hidden ? '隐藏成就 — 继续探索以解锁' : ach.desc;
+      const icon = hidden ? '❓' : ach.icon;
+
+      html += `<div class="ach ${cls}" title="${isUnlocked ? '解锁于 ' + state.unlockedDates[ach.id] : ''}">
+        <div class="ach-icon ${ach.rarity}">${icon}</div>
+        <div class="ach-info">
+          <h3>${title}
+            ${isUnlocked ? `<span class="rarity-badge ${ach.rarity}">${ach.rarity==='legendary'?'传说':ach.rarity==='epic'?'史诗':ach.rarity==='rare'?'稀有':'普通'}</span>` : ''}
+            ${cat==='隐藏' && !isUnlocked ? '<span class="rarity-badge secret">隐藏</span>' : ''}
+          </h3>
+          <p>${desc}</p>
+          ${!isUnlocked && progress > 0 ? `<div class="progress-row"><div class="pbar"><div class="pbar-fill" style="width:${progress}%"></div></div><span class="pval">${progressText}</span></div>` : ''}
+          ${isUnlocked ? `<p class="ach-date">解锁于 ${state.unlockedDates[ach.id]}</p>` : ''}
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+  }
+  grid.innerHTML = html;
+
+  // Header stats
+  document.getElementById('unlockedCount').textContent = unlocked;
+  document.getElementById('totalCount').textContent = total;
+  const pct = Math.round(unlocked / total * 100);
+  document.getElementById('perfectPercent').innerHTML = `${pct}<small style="font-size:18px">%</small>`;
+  document.getElementById('perfectBar').style.width = pct + '%';
+
+  // Recent unlocks
+  const recentList = document.getElementById('recentList');
+  const sorted = achievements.filter(a => state.unlocked[a.id]).sort((a,b) => (state.unlockedDates[b.id]||'').localeCompare(state.unlockedDates[a.id]||''));
+  if (sorted.length === 0) {
+    recentList.innerHTML = '<span style="color:var(--text3);font-size:13px">还没有解锁任何成就，快去学习吧！</span>';
+  } else {
+    recentList.innerHTML = sorted.slice(0, 6).map(a => `
+      <div class="recent-chip">
+        <div class="mini-icon ${a.rarity}">${a.icon}</div>
+        <div>
+          <div style="font-weight:600">${a.name}</div>
+          <div style="font-size:10px;color:var(--text3)">${state.unlockedDates[a.id]}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function setFilter(f) { currentFilter = f; render(); }
+
+// ===================== TOAST =====================
+function showToast(ach) {
+  const c = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<div class="toast-icon ${ach.rarity}">${ach.icon}</div><div class="toast-body"><h4>🎉 成就解锁！</h4><p>${ach.name}</p><span class="rarity-text">${ach.rarity==='legendary'?'传说级':ach.rarity==='epic'?'史诗级':ach.rarity==='rare'?'稀有':'普通'}</span></div>`;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+// ===================== CONFETTI =====================
+function spawnConfetti() {
+  const colors = ['#ff5d3b','#fbbf24','#34d399','#60a5fa','#a78bfa','#cfb53b','#f87171'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left:${Math.random()*100}vw;
+      width:${6+Math.random()*8}px;
+      height:${6+Math.random()*8}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      animation-duration:${2+Math.random()*3}s;
+      animation-delay:${Math.random()*0.8}s;
+    `;
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ===================== PUBLIC API =====================
+window.Achievements = {
+  completeLesson() { state.lessons++; saveState(); checkAll(); },
+  viewCourse(courseId) {
+    if (!state._viewed) state._viewed = {};
+    state._viewed[courseId] = true;
+    state.courses = Object.keys(state._viewed).length;
+    saveState(); checkAll();
+  },
+  completeExercise(correct) {
+    state.exercises++;
+    if (correct) { state.streak_correct++; state.total_acc_sum += 100; if (state.streak_correct > state.max_streak_correct) state.max_streak_correct = state.streak_correct; }
+    else { state.streak_correct = 0; }
+    state.avg_acc = state.exercises > 0 ? state.total_acc_sum / state.exercises : 0;
+    saveState(); checkAll();
+  },
+  perfectQuiz() { state.perfect++; saveState(); checkAll(); },
+  login() {
+    const today = new Date().toISOString().split('T')[0];
+    if (state.lastLogin) {
+      const diff = Math.floor((new Date(today) - new Date(state.lastLogin)) / 86400000);
+      state.streak = diff === 1 ? state.streak + 1 : (diff > 1 ? 1 : state.streak);
+    } else { state.streak = 1; }
+    const h = new Date().getHours();
+    if (h >= 23 || h < 5) state.night_study = true;
+    const d = new Date().getDay();
+    if (d === 0 || d === 6) state.weekend++;
+    saveState(); checkAll();
+  },
+  runCode(lang, lines) {
+    state.code_runs++;
+    if (lang && !state.langs.includes(lang)) state.langs.push(lang);
+    if (lines > state.code_lines) state.code_lines = lines;
+    state.no_errors++;
+    saveState(); checkAll();
+  },
+  codeError() { state.no_errors = 0; state.bugs_fixed++; saveState(); checkAll(); },
+  useViz(n) { if (n > state.viz_used) state.viz_used = n; saveState(); checkAll(); },
+  useDSViz() { state.ds_viz++; saveState(); checkAll(); },
+  trackTime(minutes) { if (minutes > state.daily_time) state.daily_time = minutes; saveState(); checkAll(); },
+  speedRun() { state.speed_run = true; saveState(); checkAll(); },
+  secret42() { state.secret_42 = true; saveState(); checkAll(); },
+  konamiCode() { state.konami = true; saveState(); checkAll(); },
+  completeAll() { state.all_complete = true; saveState(); checkAll(); },
+  completePython() { state.py_complete = true; saveState(); checkAll(); },
+  reset() { state = defaultState(); saveState(); render(); },
+  getState() { return state; },
+};
+
+// ===================== INIT =====================
+const konamiSeq = [38,38,40,40,37,39,37,39,66,65];
+let konamiIdx = 0;
+document.addEventListener('keydown', e => {
+  if (e.keyCode === konamiSeq[konamiIdx]) {
+    konamiIdx++;
+    if (konamiIdx === konamiSeq.length) { window.Achievements.konamiCode(); konamiIdx = 0; }
+  } else { konamiIdx = 0; }
+});
+
+state.lastLogin = new Date().toISOString().split('T')[0];
+saveState();
+render();
+checkAll();
+</script>
+</body>
+</html>

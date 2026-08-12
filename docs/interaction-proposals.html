@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>互动课堂 · 交互优化建议文档</title>
+<style>
+  :root{
+    --accent:#ff5d3b; --accent-soft:rgba(255,93,59,.10);
+    --ink:#1f2329; --ink2:#5b6470; --line:#e6e8eb; --bg:#fff; --bg2:#f7f8fa;
+    --p0:#e5484d; --p1:#f5872d; --p2:#3a8a5f;
+    --blue:#3b82f6; --purple:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif;color:var(--ink);background:var(--bg2);line-height:1.7;font-size:15px}
+  .page{max-width:960px;margin:0 auto;background:var(--bg);padding:48px 56px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  header{border-bottom:3px solid var(--accent);padding-bottom:20px;margin-bottom:8px}
+  h1{font-size:26px;margin:0 0 6px;letter-spacing:.5px}
+  .sub{color:var(--ink2);font-size:13px}
+  h2{font-size:19px;margin:38px 0 14px;padding-left:12px;border-left:4px solid var(--accent)}
+  h3{font-size:15.5px;margin:22px 0 8px;color:var(--accent)}
+  p{margin:8px 0}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13.5px}
+  th,td{border:1px solid var(--line);padding:9px 11px;vertical-align:top;text-align:left}
+  th{background:var(--bg2);font-weight:600;color:var(--ink)}
+  tr:nth-child(even) td{background:#fafbfc}
+  .tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+  .p0{background:var(--p0)} .p1{background:var(--p1)} .p2{background:var(--p2)}
+  .pill{display:inline-block;padding:1px 7px;border-radius:6px;font-size:12px;border:1px solid var(--line);background:var(--bg2);color:var(--ink2)}
+  ul{margin:8px 0;padding-left:22px} li{margin:5px 0}
+  .callout{background:var(--accent-soft);border:1px solid rgba(255,93,59,.25);border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--bg2)}
+  .card b{color:var(--accent)}
+  .kpi{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+  .kpi .box{flex:1;min-width:120px;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .kpi .n{font-size:22px;font-weight:700;color:var(--accent)}
+  .kpi .l{font-size:12px;color:var(--ink2)}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--ink2);font-size:12px;text-align:center}
+  a{color:var(--accent);text-decoration:none}
+  .toc{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px 20px;columns:2;font-size:13.5px}
+  .toc a{color:var(--ink2)}
+  @media print{body{background:#fff}.page{box-shadow:none;padding:0}}
+  @media(max-width:720px){.page{padding:24px}.grid2{grid-template-columns:1fr}.toc{columns:1}}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <h1>互动课堂 · 交互优化建议文档</h1>
+  <div class="sub">项目：interactive-classroom（概率论与数理统计 · 浙大第五版）&nbsp;|&nbsp;文档版本 v1.0&nbsp;|&nbsp;日期：2026-08-12&nbsp;|&nbsp;类型：交互体验评审与建议</div>
+</header>
+
+<div class="callout">
+  <b>文档目的：</b>基于当前版本已落地的交互能力，从「导航信息架构、知识点学习、可视化、公式实验室、反馈动效、个性化、移动端与无障碍、性能工程」八个维度，提出可落地的交互优化建议，并按优先级（P0/P1/P2）与实施阶段排序，供后续迭代参考。
+</div>
+
+<div class="toc">
+  <a href="#s1">一、交互现状概览</a><br>
+  <a href="#s2">二、体验诊断（痛点）</a><br>
+  <a href="#s3">三、交互优化建议</a><br>
+  <a href="#s4">四、建议优先级汇总</a><br>
+  <a href="#s5">五、分阶段实施路线图</a><br>
+  <a href="#s6">六、结语</a>
+</div>
+
+<!-- ============ 一、现状 ============ -->
+<h2 id="s1">一、交互现状概览</h2>
+<p>项目当前已具备较为完整的基础交互框架。下表汇总已落地的主要交互能力，作为后续建议的对照基线。</p>
+<table>
+  <thead><tr><th>模块</th><th>已实现的交互</th><th>技术 / 实现方式</th></tr></thead>
+  <tbody>
+    <tr><td>首页导航</td><td>课程卡片网格，悬浮 3D tilt 效果</td><td><code>.lab-card.tilt-3d</code> + CSS transform</td></tr>
+    <tr><td>知识点列表</td><td>卡片悬浮展开（公式 + 习题数标签）</td><td><code>.kp-card:hover .kp-expand</code>，max-height 过渡</td></tr>
+    <tr><td>知识点详情</td><td>公式速览 → 知识详解 / 题库练习 双 Tab → 折叠的可视化面板</td><td><code>renderVizView()</code> + <code>.viz-collapsible</code></td></tr>
+    <tr><td>主题系统</td><td>4 套主题 + 浅色 + 跟随系统，设置面板 6 选项 + 切换按钮</td><td><code>applyTheme()</code> + <code>localStorage</code></td></tr>
+    <tr><td>公式实验室</td><td>积分/极限/导数/级数/行列式/矩阵 等工具卡片；概率论工具箱 5 Tab 切换</td><td><code>openFormulaTool()</code> / <code>switchProbTool()</code></td></tr>
+    <tr><td>可视化引擎</td><td>假设检验 / 置信区间 / 回归 / CLT / 二项正态 等模板</td><td><code>VizEngine</code> + <code>vizTypes</code></td></tr>
+    <tr><td>做题模式</td><td>C/C++ 代码编辑 + 实时内存变化可视化</td><td>内联面板 <code>#coding-lab-panel</code></td></tr>
+    <tr><td>公式渲染</td><td>正文/结果 KaTeX 渲染</td><td><code>renderMath()</code></td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 二、诊断 ============ -->
+<h2 id="s2">二、体验诊断（痛点）</h2>
+<table>
+  <thead><tr><th>编号</th><th>痛点</th><th>影响</th><th>典型场景</th></tr></thead>
+  <tbody>
+    <tr><td>D1</td><td>移动端无 hover，卡片悬浮展开失效</td><td>手机用户无法查看公式/习题数</td><td>手机打开知识点列表</td></tr>
+    <tr><td>D2</td><td>函数可视化默认折叠，缺少引导</td><td>用户可能不知道有可视化、不点开</td><td>首次进入详情页</td></tr>
+    <tr><td>D3</td><td>可视化多为静态/需点按钮，参数不能实时联动</td><td>探究式学习体验弱</td><td>调 μ/σ 看分布变化</td></tr>
+    <tr><td>D4</td><td>公式实验室结果为演示占位，非真实计算</td><td>可信度低，无法验证作业</td><td>输入自定义数据</td></tr>
+    <tr><td>D5</td><td>缺乏全局搜索与进度/收藏</td><td>知识点多时难定位、无学习闭环</td><td>复习某章节</td></tr>
+    <tr><td>D6</td><td>主题切换入口深（设置面板），无快捷键</td><td>切换成本高</td><td>明暗环境切换</td></tr>
+    <tr><td>D7</td><td>详情页内章节/知识点切换需返回首页</td><td>连续学习被打断</td><td>学完一节下一节</td></tr>
+    <tr><td>D8</td><td>缺少即时反馈（复制成功、加载态、输入校验）</td><td>操作无确认感，易误以为卡顿</td><td>复制公式 / 计算</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 三、建议 ============ -->
+<h2 id="s3">三、交互优化建议</h2>
+
+<h3>3.1 导航与信息架构</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>A1</td><td>全局搜索栏</td><td>D5</td><td>顶部常驻搜索，支持知识点名 / 公式 / 工具名模糊匹配，回车直达详情</td><td>大幅降低信息查找成本</td><td><span class="tag p0">P0</span></td></tr>
+    <tr><td>A2</td><td>详情页章节面包屑 + 上/下知识点切换</td><td>D7</td><td>详情页顶部显示「第X章 › 知识点名」，底部「上一篇 / 下一篇」</td><td>连续学习不断流</td><td><span class="tag p1">P1</span> · <span class="tag done">已完成</span></td></tr>
+    <tr><td>A3</td><td>收藏 / 书签</td><td>D5</td><td>卡片与详情页提供收藏按钮，首页独立「收藏夹」入口</td><td>形成个人学习集</td><td><span class="tag p1">P1</span> · <span class="tag done">已完成</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 知识点学习交互</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>B1</td><td>移动端点击展开（tap to expand）</td><td>D1</td><td>检测触摸设备，悬浮改点击切换 <code>.kp-expand</code> 显隐</td><td>手机可用核心交互</td><td><span class="tag p0">P0</span></td></tr>
+    <tr><td>B2</td><td>知识点状态标识（未学/已学/收藏）</td><td>D5</td><td>卡片角标 + 进度条，状态存 <code>localStorage</code></td><td>进度可视、成就感</td><td><span class="tag done">已完成</span></td></tr>
+    <tr><td>B3</td><td>详情内容分段 Tab 化（讲解 / 例题 / 小结）</td><td>长滚动</td><td>替代单一长文，分段切换</td><td>信息密度可控</td><td><span class="tag done">已完成</span></td></tr>
+    <tr><td>B4</td><td>公式一键复制</td><td>D8</td><td>公式块 hover 显示复制按钮，复制 KaTeX/源码</td><td>方便写作业</td><td><span class="tag p1">P1</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.3 函数可视化交互</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>C1</td><td>首访引导 + 默认展开或显眼提示</td><td>D2</td><td>首次进入详情页高亮「函数可视化」面板并箭头提示；或默认展开一次</td><td>提升功能发现率</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>C2</td><td>参数滑块实时联动重绘</td><td>D3</td><td>将输入框升级为滑块/输入框双控，<code>input</code> 事件即时 <code>redraw()</code></td><td>探究式学习核心</td><td><span class="tag p0">P0</span></td></tr>
+    <tr><td>C3</td><td>正文公式与可视化锚点联动</td><td>联动弱</td><td>点击「知识详解」中公式 → 对应可视化高亮/滚动定位</td><td>理论—图形强关联</td><td><span class="tag p2">P2</span></td></tr>
+    <tr><td>C4</td><td>可视化结果导出/截图</td><td>无</td><td>提供「保存图片」按钮（canvas.toDataURL）</td><td>便于笔记/分享</td><td><span class="tag p2">P2</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.4 公式实验室交互</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>D-1</td><td>接入真实计算引擎</td><td>D4</td><td>引入 math.js / 数值算法，替代演示占位，输出真实结果</td><td>可用作作业验证</td><td><span class="tag done">已完成</span></td></tr>
+    <tr><td>D-2</td><td>工具箱 Tab 图标化 + 横向滑动</td><td>文案长</td><td>Tab 加小图标、缩短文案；窄屏可横向滚动</td><td>更紧凑清晰</td><td><span class="tag p2">P2</span></td></tr>
+    <tr><td>D-3</td><td>输入实时校验与错误提示</td><td>D8</td><td>非法输入即时标红 + 提示文案</td><td>减少无效计算</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>D-4</td><td>计算历史 / 最近使用</td><td>无</td><td>记住最近 5 次工具与输入，快速复用</td><td>提升复用效率</td><td><span class="tag p2">P2</span></td></tr>
+    <tr><td>D-5</td><td>结果一键复制</td><td>D8</td><td>结果区复制按钮</td><td>方便引用</td><td><span class="tag p1">P1</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.5 反馈、动效与微交互</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>E1</td><td>统一 Toast 反馈</td><td>D8</td><td>复制成功 / 保存成功 轻提示，自动消失</td><td>操作有确认感</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>E2</td><td>加载骨架屏 / loading</td><td>D8</td><td>可视化重绘、大内容加载时显示骨架或 spinner</td><td>消除「卡顿」误解</td><td><span class="tag p2">P2</span></td></tr>
+    <tr><td>E3</td><td>主题切换快捷键 + 平滑过渡</td><td>D6</td><td>快捷键（如 <code>T</code>）切换；过渡动画 <code>transition</code></td><td>降低切换成本</td><td><span class="tag p2">P2</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.6 个性化与学习进度</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>F1</td><td>学习进度持久化</td><td>D5</td><td>已学/收藏状态、上次位置存 <code>localStorage</code>，多页共享</td><td>学习闭环</td><td><span class="tag p0">P0</span></td></tr>
+    <tr><td>F2</td><td>错题本</td><td>无</td><td>题库练习答错自动归档，可回顾</td><td>针对性复习</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>F3</td><td>连续学习 streak / 每日目标</td><td>无</td><td>首页展示连续学习天数</td><td>激励持续使用</td><td><span class="tag p2">P2</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.7 移动端与无障碍</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>G1</td><td>移动端底部 Tab 导航</td><td>无</td><td>首页/实验室/收藏/我的 底部栏，拇指可达</td><td>移动端效率</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>G2</td><td>键盘可达性 + ARIA</td><td>无</td><td>Tab 可聚焦、回车触发；弹窗 <code>role="dialog"</code></td><td>无障碍合规</td><td><span class="tag p2">P2</span></td></tr>
+    <tr><td>G3</td><td>触控目标 ≥ 44px</td><td>部分偏小</td><td>按钮/标签最小尺寸规范</td><td>减少误触</td><td><span class="tag p2">P2</span></td></tr>
+  </tbody>
+</table>
+
+<h3>3.8 性能与工程</h3>
+<table>
+  <thead><tr><th>编号</th><th>建议</th><th>针对现状</th><th>改进方案</th><th>收益</th><th>优先级</th></tr></thead>
+  <tbody>
+    <tr><td>H1</td><td><code>app.js</code> 模块化拆分 / 懒加载</td><td>单文件过大</td><td>按模块拆文件，路由级懒加载</td><td>首屏更快、可维护</td><td><span class="tag p1">P1</span></td></tr>
+    <tr><td>H2</td><td>首屏与资源优化</td><td>无</td><td>KaTeX/字体按需加载，图片懒加载</td><td>弱网可用</td><td><span class="tag p2">P2</span></td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 四、汇总 ============ -->
+<h2 id="s4">四、建议优先级汇总</h2>
+<div class="kpi">
+  <div class="box"><div class="n">5</div><div class="l">P0 核心可用性</div></div>
+  <div class="box"><div class="n">11</div><div class="l">P1 显著体验</div></div>
+  <div class="box"><div class="n">11</div><div class="l">P2 精细打磨</div></div>
+  <div class="box"><div class="n">27</div><div class="l">建议总数</div></div>
+</div>
+<table>
+  <thead><tr><th>优先级</th><th>含义</th><th>建议编号</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag p0">P0</span></td><td>影响核心可用性，应优先落地</td><td>A1 全局搜索 · B1 移动端展开 · C2 参数实时联动 · D-1 真实计算 · F1 进度持久化</td></tr>
+    <tr><td><span class="tag p1">P1</span></td><td>显著提升体验，第二阶段完成</td><td>A2 面包屑 · A3 收藏 · B2 状态标识 · B4 公式复制 · C1 可视化引导 · D-3 校验 · D-5 结果复制 · E1 Toast · F2 错题本 · G1 移动导航 · H1 模块化</td></tr>
+    <tr><td><span class="tag p2">P2</span></td><td>锦上添花，长期打磨</td><td>B3 分段Tab · C3 锚点联动 · C4 截图导出 · D-2 Tab图标 · D-4 历史 · E2 骨架屏 · E3 快捷键 · F3 streak · G2 无障碍 · G3 触控尺寸 · H2 资源优化</td></tr>
+  </tbody>
+</table>
+
+<!-- ============ 五、路线图 ============ -->
+<h2 id="s5">五、分阶段实施路线图</h2>
+<div class="grid2">
+  <div class="card"><b>阶段一 · 基础体验（P0）</b><ul>
+    <li>A1 全局搜索</li><li>B1 移动端点击展开</li>
+    <li>C2 可视化参数实时联动</li><li>D-1 真实计算引擎</li>
+    <li>F1 学习进度持久化</li>
+  </ul>目标：核心场景在桌面与移动端均可用、可信。</div>
+  <div class="card"><b>阶段二 · 学习闭环（P1）</b><ul>
+    <li>A2/A3 导航与收藏</li><li>B2/B4 状态与复制</li>
+    <li>C1 可视化引导</li><li>D-3/D-5 校验与复制</li>
+    <li>E1 Toast · F2 错题本</li><li>G1 移动导航 · H1 模块化</li>
+  </ul>目标：形成「学—练—收藏—复习」闭环。</div>
+  <div class="card"><b>阶段三 · 精细打磨（P2）</b><ul>
+    <li>B3/C3/C4 内容分段与联动</li><li>D-2/D-4 工具箱增强</li>
+    <li>E2/E3 动效与快捷键</li><li>F3 streak</li>
+    <li>G2/G3 无障碍 · H2 资源优化</li>
+  </ul>目标：专业级交互质感与可访问性。</div>
+  <div class="card"><b>验收建议</b><ul>
+    <li>每阶段以「可点击原型 + 真实数据」验收</li>
+    <li>P0 须覆盖桌面 + 移动双端回归</li>
+    <li>建立简单交互走查清单（10 项）</li>
+  </ul></div>
+</div>
+
+<!-- ============ 六、结语 ============ -->
+<h2 id="s6">六、结语</h2>
+<p>当前版本已搭建起扎实的交互骨架，尤其在「悬浮卡片、可折叠可视化、多主题、工具箱 Tab」等细节上体现了良好的设计意识。下一步的重心应从「功能可用」转向「体验可信与闭环」——<b>真实计算、移动端适配、学习进度</b>是 P0 三件最值得优先投入的事；在闭环成型后，再以微交互与无障碍细节提升整体质感。</p>
+<p class="sub">说明：本文档为建议性评审，具体落地顺序可结合开发资源与课程节点（如暑期交付计划）灵活调整。</p>
+
+<footer>互动课堂交互优化建议文档 · v1.0 · 2026-08-12 · 内部评审用</footer>
+</div>
+</body>
+</html>
