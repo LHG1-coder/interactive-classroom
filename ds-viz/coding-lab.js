@@ -158,6 +158,7 @@ class CMiniInterpreter {
     this.stackAddrCounter = 0x7fffe000;
     this.steps = [];           // 每步的快照
     this.ptrTypeCache = new Map(); // varName -> baseType
+    this.currentLineNum = 0;   // 当前执行行号（步骤高亮用）
   }
 
   reset() {
@@ -168,6 +169,7 @@ class CMiniInterpreter {
     this.stackAddrCounter = 0x7fffe000;
     this.steps = [];
     this.ptrTypeCache.clear();
+    this.currentLineNum = 0;
   }
 
   _allocStackAddr(size) {
@@ -190,6 +192,7 @@ class CMiniInterpreter {
     // 深拷贝当前状态
     const snap = {
       desc: stepDesc,
+      lineNum: this.currentLineNum,   // 记录当前执行行号（供 UI 高亮）
       stackFrames: this.stackFrames.map(f => ({
         name: f.name,
         vars: new Map(f.vars),
@@ -221,6 +224,7 @@ class CMiniInterpreter {
 
   // 执行一行
   executeLine(line, lineNum) {
+    this.currentLineNum = lineNum;   // 记录当前行号，快照时写入
     // === 变量声明 ===
     // int x = 10;  int *p = &x;  int* p = &x;  int** pp;
     const declMatch = line.match(/^(int|char|float|double)\s*(\**)\s*(\w+)\s*(?:\[\s*(\d+)\s*\])?\s*(?:=\s*(.+?))?\s*;?\s*$/);
@@ -1085,6 +1089,14 @@ class CodingLabEngine {
       return this.interpreter.steps[this.currentStepIdx].desc;
     }
     return '';
+  }
+
+  // 当前步骤对应的源码行号（无则 0）
+  getCurrentLineNum() {
+    if (this.currentStepIdx >= 0 && this.currentStepIdx < this.totalSteps) {
+      return this.interpreter.steps[this.currentStepIdx].lineNum || 0;
+    }
+    return 0;
   }
 
   _showCurrentStep() {

@@ -10798,6 +10798,7 @@ function openCodingLab() {
     ta.addEventListener('scroll', function() {
       const pre = document.getElementById('clabHighlight');
       if (pre) pre.scrollTop = this.scrollTop;
+      if (typeof _highlightClabLine === 'function') _highlightClabLine();
     });
   }
 
@@ -10807,6 +10808,8 @@ function openCodingLab() {
 }
 
 function closeCodingLab() {
+  if (_codingLab) _codingLab.pause();
+  if (typeof _clabUiTimer !== 'undefined' && _clabUiTimer) { clearInterval(_clabUiTimer); _clabUiTimer = null; }
   // 清除所有 LeaderLine 箭头
   if (typeof globalMemoryArrows !== 'undefined') {
     for (const [key, arrow] of globalMemoryArrows) {
@@ -10818,42 +10821,49 @@ function closeCodingLab() {
   if (panel) panel.style.display = 'none';
 }
 
-// ═══════ ▶ 运行：Judge0 在线编译 + 内存可视化 ═══════
+// ═══════ ▶ 运行：双引擎（可视化 + 真实编译）═══════
 async function clabRun() {
   const ta = document.getElementById('clabCodeArea');
   const out = document.getElementById('clabOutput');
   const status = document.getElementById('clabRunStatus');
   const btn = document.getElementById('clabRunBtn');
+  const sel = document.getElementById('clabCodeLangSelect');
   if (!ta || !out) return;
 
   const code = ta.value;
   if (!code.trim()) { out.textContent = '请先编写代码'; return; }
 
+  /* ① 可视化引擎：CMiniInterpreter 解析（即使失败也不影响 Judge0） */
+  if (_codingLab) {
+    try { _codingLab.showFinalState(); } catch (e) { /* 高级语法（vector/STL）不支持可视化，忽略 */ }
+  }
+  _updateClabStepInfo();
+
+  /* ② 真实编译引擎：Judge0 在线编译 */
+  const lang = sel ? sel.value : 'c';
   btn.disabled = true;
-  btn.textContent = '编译中…';
-  status.textContent = '编译中…';
+  const prevText = btn.textContent;
+  btn.textContent = '⏳ 编译中…';
+  status.textContent = '⏳ 编译中…';
   status.style.color = '#fbbf24';
   out.style.color = '#e6db74';
   out.textContent = '';
 
   try {
-    // 提交到 Judge0 CE (C 语言, language_id=50)
     const submitRes = await fetch(JUDGE0_URL + '/submissions?base64_encoded=false&wait=false', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         source_code: code,
-        language_id: 50,  // C (GCC 9.4.0)
+        language_id: JUDGE0_LANG_ID[lang] || 50,
         stdin: '',
         cpu_time_limit: 5,
         memory_limit: 128000
       })
     });
-
     if (!submitRes.ok) throw new Error('Judge0 不可用 (HTTP ' + submitRes.status + ')');
     const { token } = await submitRes.json();
 
-    // 轮询结果
     let result = null;
     for (let i = 0; i < 20; i++) {
       await new Promise(r => setTimeout(r, 800));
@@ -10861,41 +10871,34 @@ async function clabRun() {
       result = await getRes.json();
       if (result.status && result.status.id >= 3) break;
     }
-
     if (!result) throw new Error('获取结果超时');
 
     const statusId = result.status ? result.status.id : 0;
     if (statusId === 3) {
-      // 成功
       out.style.color = '#86efac';
       out.textContent = result.stdout || '（无输出）';
       status.textContent = '✓ 运行成功';
       status.style.color = '#86efac';
     } else if (statusId === 6) {
-      // 编译错误
       out.style.color = '#f87171';
       out.textContent = '编译错误:\n' + (result.compile_output || '未知错误');
-      status.textContent = '编译错误';
+      status.textContent = '✗ 编译错误';
       status.style.color = '#f87171';
     } else {
-      // 运行时错误
       out.style.color = '#f87171';
       out.textContent = result.stderr || result.message || '运行异常';
-      status.textContent = '运行错误';
+      status.textContent = '⚠ 运行错误';
       status.style.color = '#f87171';
     }
   } catch (err) {
     out.style.color = '#f87171';
-    out.textContent = '⚠ 在线编译服务连接失败\n' + err.message;
-    status.textContent = '网络错误';
+    out.textContent = '⚠ 在线编译服务连接失败\n' + err.message + '\n\n提示：内存可视化仍可使用（点击「▶ 播放」逐步执行）';
+    status.textContent = '⚠ 网络错误';
     status.style.color = '#f87171';
   } finally {
     btn.disabled = false;
-    btn.textContent = '▶ 运行';
+    btn.textContent = prevText || '▶ 运行';
   }
-
-  // 同时刷新内存可视化
-  _autoRunClab();
 }
 
 // 编辑触发自动运行（debounce 后调用）
@@ -10910,18 +10913,21 @@ function clabStep() {
   if (_codingLab.totalSteps === 0) _codingLab.run();
   _codingLab.step();
   _updateClabStepInfo();
+  _syncClabPlayBtn();
 }
 
 function clabStepBack() {
   if (!_codingLab) return;
   _codingLab.stepBack();
   _updateClabStepInfo();
+  _syncClabPlayBtn();
 }
 
 function clabReset() {
   if (!_codingLab) return;
   _codingLab.reset();
   _updateClabStepInfo();
+  _syncClabPlayBtn();
   // 重置后自动跑一次展示初始/完整状态
   _autoRunClab();
 }
@@ -10932,7 +10938,8 @@ function _updateClabStepInfo() {
     const total = _codingLab.totalSteps;
     const current = _codingLab.currentStepIdx + 1;
     if (total > 0) {
-      info.innerHTML = '<span style="color:#a6e22e">● LIVE</span> ' + current + '/' + total;
+      const ln = _codingLab.getCurrentLineNum();
+      info.innerHTML = '<span style="color:#a6e22e">● LIVE</span> ' + current + '/' + total + (ln ? ' · 第' + ln + '行' : '');
     } else {
       info.textContent = '步骤: 0/0';
     }
@@ -10941,26 +10948,95 @@ function _updateClabStepInfo() {
   if (lineEl && _codingLab) {
     const desc = _codingLab.getCurrentStepDesc();
     if (desc) {
-      lineEl.textContent = '▶ ' + desc;
+      const ln = _codingLab.getCurrentLineNum();
+      lineEl.textContent = '▶ ' + (ln ? '第' + ln + '行: ' : '') + desc;
     } else if (_codingLab.totalSteps > 0 && _codingLab.currentStepIdx >= _codingLab.totalSteps - 1) {
       lineEl.textContent = '✅ 当前内存状态';
     } else {
       lineEl.textContent = '输入代码自动解析...';
     }
   }
+  _highlightClabLine();
 }
 
-function _highlightCurrentLine() {
+/* 代码区当前行高亮（黄色条跟随执行行） */
+function _highlightClabLine() {
   const ta = document.getElementById('clabCodeArea');
-  if (!ta || !_codingLab || _codingLab.totalSteps === 0) return;
-  if (_codingLab.currentStepIdx < 0) return;
-  const desc = _codingLab.getCurrentStepDesc();
-  if (!desc) return;
-  // 从描述中提取行号信息（如有 "第X行" 或通过代码内容查找）
-  // 简单滚动到代码区顶部附近
-  const stepIdx = _codingLab.currentStepIdx;
-  const ratio = _codingLab.totalSteps > 0 ? stepIdx / _codingLab.totalSteps : 0;
-  ta.scrollTop = ratio * ta.scrollHeight;
+  const bar = document.getElementById('clabLineBar');
+  if (!ta || !bar || !_codingLab) { if (bar) bar.style.color = 'transparent'; return; }
+  const ln = _codingLab.getCurrentLineNum();
+  if (!ln || _codingLab.totalSteps === 0 || _codingLab.currentStepIdx < 0) {
+    bar.style.top = '-100px';
+    return;
+  }
+  /* 行高 = font-size 0.88rem × line-height 1.7 ≈ 24px，顶部 padding 16px */
+  const top = 16 + (ln - 1) * 24 - ta.scrollTop;
+  bar.style.top = top + 'px';
+  /* 滚回当前行可见 */
+  if (top < 16 || top > ta.clientHeight - 40) {
+    ta.scrollTop = Math.max(0, (ln - 1) * 24 - ta.clientHeight / 2 + 16);
+  }
+}
+
+/* ▶ 逐步播放 / 暂停 */
+let _clabUiTimer = null;
+
+function clabPlay() {
+  if (!_codingLab) return;
+  if (_codingLab.playing) {
+    _codingLab.pause();
+  } else {
+    if (_codingLab.totalSteps === 0 || _codingLab.currentStepIdx >= _codingLab.totalSteps - 1) {
+      _codingLab.reset();
+      _codingLab.run();
+    }
+    _codingLab.play();
+  }
+  _updateClabStepInfo();
+  _syncClabPlayBtn();
+  /* 播放期间轮询同步 UI（引擎内部 interval 不通知 UI） */
+  if (_codingLab.playing) {
+    if (_clabUiTimer) clearInterval(_clabUiTimer);
+    _clabUiTimer = setInterval(function () {
+      _updateClabStepInfo();
+      _syncClabPlayBtn();
+      if (!_codingLab.playing) { clearInterval(_clabUiTimer); _clabUiTimer = null; }
+    }, 120);
+  }
+}
+
+function _syncClabPlayBtn() {
+  const btn = document.getElementById('clabPlayBtn');
+  if (btn && _codingLab) btn.textContent = _codingLab.playing ? '⏸ 暂停' : '▶ 播放';
+}
+
+/* 速度滑块（ms/步） */
+function clabSpeedChange(v) {
+  if (!_codingLab) return;
+  v = parseInt(v, 10) || 3;
+  const ms = Math.max(80, Math.round(1200 / v));
+  _codingLab.setSpeed(ms);
+}
+
+/* 示例代码一键加载 */
+function clabLoadExample(id) {
+  const ta = document.getElementById('clabCodeArea');
+  const sel = document.getElementById('clabExampleSelect');
+  if (!ta || !id) { if (sel) sel.value = ''; return; }
+  const EXAMPLES = {
+    ptr: '#include <stdio.h>\n\nint main() {\n    int x = 10;\n    int *p = &x;\n    *p = 20;\n    printf("x = %d\\n", x);\n    return 0;\n}',
+    array: '#include <stdio.h>\n\nint main() {\n    int arr[4] = {1,2,3,4};\n    int sum = 0;\n    sum = sum + arr[0];\n    sum = sum + arr[1];\n    sum = sum + arr[2];\n    sum = sum + arr[3];\n    printf("sum = %d\\n", sum);\n    return 0;\n}',
+    struct: '#include <stdio.h>\n\nstruct Point {\n    int x;\n    int y;\n};\n\nint main() {\n    struct Point p;\n    p.x = 3;\n    p.y = 5;\n    printf("(%d, %d)\\n", p.x, p.y);\n    return 0;\n}',
+    malloc: '#include <stdio.h>\n#include <stdlib.h>\n\nint main() {\n    int *p = (int*)malloc(2 * sizeof(int));\n    p[0] = 100;\n    p[1] = 200;\n    free(p);\n    return 0;\n}',
+    swap: '#include <stdio.h>\n\nvoid swap(int *a, int *b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\n\nint main() {\n    int x = 3;\n    int y = 7;\n    swap(&x, &y);\n    printf("x=%d y=%d\\n", x, y);\n    return 0;\n}',
+  };
+  if (EXAMPLES[id]) {
+    ta.value = EXAMPLES[id];
+    ta.dispatchEvent(new Event('input'));
+    const out = document.getElementById('clabOutput');
+    if (out) out.textContent = '';
+    if (sel) sel.value = '';
+  }
 }
 
 /* ═══════ C/C++ 代码示例映射 ═══════ */

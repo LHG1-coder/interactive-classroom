@@ -597,7 +597,29 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
               </svg>
               <span style="font-weight:600;font-size:0.95rem;color:#d4d4dc">C/C++ 内存练习</span>
               <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-                <!-- 执行控制 -->
+                <select id="clabExampleSelect" style="background:#1e1f1c;color:#d4d4dc;border:1px solid #fd971f55;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;cursor:pointer" onchange="clabLoadExample(this.value)">
+                  <option value="">🧩 示例代码…</option>
+                  <option value="ptr">指针入门</option>
+                  <option value="array">数组求和</option>
+                  <option value="struct">结构体成员</option>
+                  <option value="malloc">堆内存 malloc</option>
+                  <option value="swap">指针交换</option>
+                </select>
+                <select id="clabCodeLangSelect" style="background:#1e1f1c;color:#d4d4dc;border:1px solid #fd971f55;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.78rem;cursor:pointer" title="语言（用于真实编译）">
+                  <option value="c">C</option>
+                  <option value="cpp14">C++14</option>
+                  <option value="cpp17" selected>C++17</option>
+                  <option value="cpp20">C++20</option>
+                  <option value="python3">Python 3</option>
+                </select>
+                <button class="btn btn-outline" style="padding:0.4rem 0.7rem;font-size:0.82rem" onclick="clabStepBack()" title="上一步">⏮</button>
+                <button id="clabPlayBtn" class="btn btn-outline" style="padding:0.4rem 0.7rem;font-size:0.82rem;min-width:64px" onclick="clabPlay()" title="逐步播放/暂停">▶ 播放</button>
+                <button class="btn btn-outline" style="padding:0.4rem 0.7rem;font-size:0.82rem" onclick="clabStep()" title="下一步">⏭</button>
+                <div style="display:flex;align-items:center;gap:4px">
+                  <span style="font-size:0.72rem;color:#75715e">速度</span>
+                  <input type="range" id="clabSpeedRange" min="1" max="10" value="3" step="1" style="width:56px;accent-color:#fd971f" oninput="clabSpeedChange(this.value)">
+                </div>
+                <span style="width:1px;height:18px;background:#3e3d32"></span>
                 <button id="clabRunBtn" class="btn btn-primary" style="padding:0.4rem 1rem;font-size:0.82rem;background:#fd971f;border-color:#fd971f" onclick="clabRun()">▶ 运行</button>
                 <button id="clabResetBtn" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.82rem" onclick="clabReset()">↻ 重置</button>
                 <button class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem" onclick="closeCodingLab()">关闭</button>
@@ -613,10 +635,11 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
                 </div>
                 <div style="flex:1;position:relative;overflow:hidden">
                   <pre id="clabHighlight" style="position:absolute;top:0;left:0;width:100%;height:100%;margin:0;padding:16px;font-family:'Fira Code','Cascadia Code','Consolas',monospace;font-size:0.88rem;line-height:1.7;white-space:pre-wrap;word-wrap:break-word;overflow:hidden;pointer-events:none;z-index:1;background:#272822;border:none;border-radius:0"><code id="clabHighlightCode" style="font-family:inherit;font-size:inherit;line-height:inherit;background:transparent;padding:0"></code></pre>
+                  <div id="clabLineBar" style="position:absolute;left:0;right:0;height:24px;background:rgba(253,151,31,0.16);border-left:3px solid #fd971f;z-index:2;pointer-events:none;top:-100px;transition:top .12s;mix-blend-mode:screen"></div>
                   <textarea id="clabCodeArea" spellcheck="false" placeholder="// 在这里写 C/C++ 代码&#10;// 比如: int x = 10;&#10;//       int *p = &x;&#10;// 右侧实时显示内存变化" style="position:relative;z-index:2;width:100%;height:100%;background:transparent;color:transparent;caret-color:#d4d4dc;font-family:'Fira Code','Cascadia Code','Consolas',monospace;font-size:0.88rem;line-height:1.7;padding:16px;border:none;outline:none;resize:none;tab-size:4;-webkit-text-fill-color:transparent"></textarea>
                 </div>
                 <div style="padding:6px 14px;font-size:0.75rem;color:#75715e;border-top:1px solid #3e3d32">
-                  💡 自由编写 C/C++ 代码 → 点「运行」显示内存变化
+                  💡 写 C 子集代码 → 「⏯ 播放」逐步可视化栈/堆内存变化；「▶ 运行」用真实编译器（支持 C/C++17/STL）跑一遍拿输出，两种结果同屏展示
                 </div>
               </div>
               <!-- 右侧：内存可视化 + 运行输出 -->
