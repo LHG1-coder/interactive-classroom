@@ -8,7 +8,7 @@
   'use strict';
 
   const STORAGE_KEY = 'ach_data_v3';
-  const ACH_DEBUG = true; // true=每次刷新重置成就
+  const ACH_DEBUG = false; // true=每次刷新重置成就
 
   (function resetIfDebug() {
     if (ACH_DEBUG) { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem("ach_data_v2"); }
