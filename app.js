@@ -10262,14 +10262,32 @@ async function clabRun() {
   const code = ta.value;
   if (!code.trim()) { out.innerHTML = '<span style="color:#75715e">（请先编写代码）</span>'; status.textContent='⚠ 等待输入'; status.style.color='#fbbf24'; return; }
 
-  /* 智能弹出输入框：检测代码是否需要 stdin 输入（scanf/cin/gets/getline/getchar 等） */
-  const needsStdin = /\b(scanf|cin\s*>>|cin\s*>>|gets\s*\(|getline\s*\(|getchar\s*\(|readline|read\s*\(|input\s*\()/.test(code);
+  /* ── 打开运行终端窗口（总是弹出，类似 Dev-C++ 运行窗口） ── */
+  _clabBindModalEvents();
+  const modal = document.getElementById('clabRunModal');
+  const modalOut = document.getElementById('clabModalOutput');
+  const modalStatus = document.getElementById('clabModalStatus');
+  const inputWrap = document.getElementById('clabModalInputWrap');
+  const modalInput = document.getElementById('clabRunModalInput');
   const stdinEl = document.getElementById('clabStdinArea');
+
+  modal.style.display = 'flex';
+  modalOut.innerHTML = '<span style="color:#75715e">⏳ 准备运行...</span>';
+  modalStatus.textContent = '准备运行…';
+  modalStatus.style.color = '#fbbf24';
+
+  /* 检测代码是否需要 stdin 输入 */
+  const needsStdin = /\b(scanf\s*\(|cin\s*>>|gets\s*\(|getline\s*\(|getchar\s*\(|readline\s*\(|input\s*\()/.test(code);
   if (needsStdin && stdinEl && !stdinEl.value.trim()) {
+    inputWrap.style.display = 'block';
+    modalInput.value = '';
+    setTimeout(function () { modalInput.focus(); }, 60);
+    /* 等待用户输入回车 / 点运行 / 跳过 */
     await new Promise(function (resolve) {
-      clabRunModalOpen(resolve);
+      _clabModalCtx = { resolve: resolve };
     });
-    /* resolve 后继续执行（modal 关闭按钮或确定按钮都会调用 resolve） */
+  } else {
+    inputWrap.style.display = 'none';
   }
 
   /* ① 可视化引擎：CMiniInterpreter 解析（即使失败也不影响 Judge0） */
@@ -10285,11 +10303,12 @@ async function clabRun() {
   btn.textContent = '⏳ 编译中…';
   status.textContent = '⏳ 编译中…';
   status.style.color = '#fbbf24';
-  out.style.color = '#e6db74';
-  out.textContent = '';
+  modalOut.innerHTML = '<span style="color:#fbbf24">⏳ 编译中...</span>';
+  modalStatus.textContent = '编译中…';
+  modalStatus.style.color = '#fbbf24';
 
   try {
-    const stdinText = (document.getElementById('clabStdinArea') || {}).value || '';
+    const stdinText = (stdinEl || {}).value || '';
     const submitRes = await fetch(JUDGE0_URL + '/submissions?base64_encoded=true&wait=false', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -10326,88 +10345,95 @@ async function clabRun() {
     const mem = result.memory || '';
     const exitMsg = time ? '✓ Process exited with return value 0 (' + time + 's' + (mem ? ', ' + mem + ' KB' : '') + ')' : '';
 
+    let html = '';
     if (statusId === 3) {
-      out.style.color = '#cccccc';
-      let html = '';
       if (compileOutput) html += '<span style="color:#9cdcfe">📋 编译信息:\n' + escHtml(compileOutput) + '\n</span>';
       if (stdout) html += '<span style="color:#cccccc">📤 输出:\n' + escHtml(stdout) + '\n</span>';
       if (exitMsg) html += '<span style="color:#4ec9b0">' + exitMsg + '\n</span>';
-      out.innerHTML = html || '<span style="color:#75715e">（无输出）</span>';
+      html = html || '<span style="color:#75715e">（无输出）</span>';
       status.textContent = '✓ 运行成功';
       status.style.color = '#86efac';
+      modalStatus.textContent = '✓ 运行成功';
+      modalStatus.style.color = '#86efac';
     } else if (statusId === 6) {
-      out.style.color = '#f48771';
-      out.innerHTML = '<span style="color:#f48771">✗ 编译错误:\n' + escHtml(compileOutput || '未知错误') + '\n</span>' +
+      html = '<span style="color:#f48771">✗ 编译错误:\n' + escHtml(compileOutput || '未知错误') + '\n</span>' +
         (exitMsg ? '<span style="color:#4ec9b0">' + exitMsg + '</span>' : '');
       status.textContent = '✗ 编译错误';
       status.style.color = '#f87171';
+      modalStatus.textContent = '✗ 编译错误';
+      modalStatus.style.color = '#f87171';
     } else {
-      out.style.color = '#f48771';
-      let html = '<span style="color:#f48771">✗ ' + escHtml(statusDesc || '运行错误') + '\n';
+      html = '<span style="color:#f48771">✗ ' + escHtml(statusDesc || '运行错误') + '\n';
       if (stderr) html += escHtml(stderr);
       if (exitMsg) html += '\n<span style="color:#4ec9b0">' + exitMsg + '</span>';
       html += '</span>';
-      out.innerHTML = html;
       status.textContent = '⚠ ' + (statusDesc || '运行错误');
       status.style.color = '#f87171';
+      modalStatus.textContent = '⚠ ' + (statusDesc || '运行错误');
+      modalStatus.style.color = '#f87171';
     }
+
+    /* 双写：弹窗输出区 + 面板控制台 */
+    modalOut.innerHTML = html;
+    modalOut.style.color = '';
+    out.innerHTML = html;
+    out.style.color = '';
   } catch (err) {
-    out.style.color = '#f87171';
-    out.textContent = '⚠ 在线编译服务连接失败\n' + err.message + '\n\n提示：内存可视化仍可使用（点击「▶ 播放」逐步执行）';
+    const errHtml = '<span style="color:#f87171">⚠ 在线编译服务连接失败\n' + escHtml(err.message) + '\n\n提示：内存可视化仍可使用（点击「▶ 播放」逐步执行）</span>';
+    modalOut.innerHTML = errHtml;
+    out.innerHTML = errHtml;
     status.textContent = '⚠ 网络错误';
     status.style.color = '#f87171';
+    modalStatus.textContent = '⚠ 网络错误';
+    modalStatus.style.color = '#f87171';
   } finally {
     btn.disabled = false;
     btn.textContent = prevText || '▶ 运行';
   }
 }
 
-/* ═══════ 运行输入弹窗（点击运行且需要输入时弹出）═══════ */
-let _clabModalResolve = null;
+/* ═══════ 运行终端窗口（点击 ▶ 运行总是弹出）═══════ */
+let _clabModalCtx = null;
 
-function clabRunModalOpen(resolve) {
+function _clabBindModalEvents() {
   const modal = document.getElementById('clabRunModal');
+  if (!modal || modal._bound) return;
+  modal._bound = true;
+
   const input = document.getElementById('clabRunModalInput');
-  const okBtn = document.getElementById('clabRunModalOk');
-  if (!modal || !input) { resolve(); return; }
+  const okBtn = document.getElementById('clabModalOk');
+  const skipBtn = document.getElementById('clabModalSkipBtn');
+  const closeBtn = modal.querySelector('[onclick="clabRunModalSkip()"]');
 
-  _clabModalResolve = resolve;
-  input.value = '';
-  modal.style.display = 'flex';
-  setTimeout(function () { input.focus(); }, 30);
-
-  function cleanup() {
-    modal.style.display = 'none';
-    input.removeEventListener('keydown', onKey);
-    okBtn.removeEventListener('click', onOk);
-    document.removeEventListener('keydown', onEsc);
-    _clabModalResolve = null;
-  }
-
-  function onOk() {
-    const stdinEl = document.getElementById('clabStdinArea');
-    if (stdinEl) stdinEl.value = input.value;
-    const r = _clabModalResolve; cleanup(); if (r) r();
-  }
-
-  function onEsc(e) { if (e.key === 'Escape') { onSkip(); } }
-
-  function onKey(e) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onOk(); }
-  }
-
-  function onSkip() {
-    const stdinEl = document.getElementById('clabStdinArea');
-    if (stdinEl) stdinEl.value = '';
-    const r = _clabModalResolve; cleanup(); if (r) r();
-  }
-
-  input.addEventListener('keydown', onKey);
-  okBtn.addEventListener('click', onOk);
-  document.addEventListener('keydown', onEsc);
-  /* 把 onSkip 暴露给按钮 onclick */
-  window.clabRunModalSkip = onSkip;
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); _clabModalCommit(true); }
+  });
+  okBtn.addEventListener('click', function () { _clabModalCommit(true); });
+  skipBtn.addEventListener('click', function () { _clabModalCommit(false); });
+  if (closeBtn) closeBtn.addEventListener('click', function () { _clabModalCommit(false); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && _clabModalCtx && document.getElementById('clabRunModal').style.display === 'flex') {
+      _clabModalCommit(false);
+    }
+  });
 }
+
+function _clabModalCommit(withInput) {
+  if (!_clabModalCtx) return;
+  const input = document.getElementById('clabRunModalInput');
+  const stdinEl = document.getElementById('clabStdinArea');
+  if (withInput && input && stdinEl) {
+    stdinEl.value = input.value;          /* 输入值同步到面板 stdin 框 */
+  } else if (!withInput && stdinEl) {
+    stdinEl.value = '';                   /* 跳过 → 空 stdin */
+  }
+  const r = _clabModalCtx.resolve;
+  _clabModalCtx = null;
+  if (r) r();
+}
+
+/* 兼容旧的点击调用（✕/跳过按钮在 HTML 中直接引用） */
+function clabRunModalSkip() { _clabModalCommit(false); }
 
 // 编辑触发自动运行（debounce 后调用）
 function _autoRunClab() {
