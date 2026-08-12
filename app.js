@@ -6896,6 +6896,50 @@ function navigateAdjacentKP(delta) {
 
 
 function renderVizView(ch, kp) {
+  // Python course: dedicated py-viz renderer (prevents generic math viz fallback)
+  if (ch.courseId === "python") {
+    var py_el = document.getElementById("viz-view");
+    var py_algo = pyVizMap[kp.name] || { kpId: "py-1-0", name: "Python演示" };
+    var py_idx = ch.kps.indexOf(kp);
+    var py_cObj = codeSamples[ch.courseId + "-" + ch.num + "-" + py_idx];
+    var py_code = py_cObj ? py_cObj.code : "print('Hello Python!')";
+    var py_kpD = getKPDetail(ch.courseId, ch.num, py_idx);
+    var py_expl = py_kpD && py_kpD.explanation ? py_kpD.explanation.split(String.fromCharCode(10)).join("<br>") : "暂无详细讲解。";
+    var py_probs = "";
+    if (py_kpD && py_kpD.problems) {
+      py_probs = py_kpD.problems.map(function(p, i) {
+        return "<div class=practice-item><div class=practice-q><span class=q-num>Q"+(i+1)+"</span>"+p.q+"</div><div class=practice-a style=display:none><b>答：</b>"+p.a+"</div></div>";
+      }).join("");
+    } else { py_probs = "<p>暂无练习题</p>"; }
+    py_el.innerHTML = "<div class=view-back-bar><button class=view-back-btn onclick=backToKP()>返回知识点</button><span class=view-back-title>第"+ch.num+"章 "+kp.name+"</span></div>"
+      + "<div class=viz-panel><div class=viz-header><div class=viz-icon-lg style=background:#3776AB22;color:#3776AB>PY</div><div class=viz-title-area><h2>"+kp.name+"</h2><p>"+kp.desc+"</p></div></div>"
+      + "<div class=sort-dual-wrap><div class=sort-anim-col><div class=sort-anim-header>"+py_algo.name+"演示</div>"
+      + "<canvas id=pyVizCanvas style=display:block;width:100%;border-radius:10px;background:#0f172a></canvas>"
+      + "<div class=sort-progress-wrap><div class=sort-progress-bar><div class=sort-progress-fill id=pyProgressFill></div></div></div>"
+      + "<div class=sort-step-info id=pyStepInfo>准备中...</div>"
+      + "<div class=sort-controls><button class=sort-btn id=pyPlayBtn onclick=PyVizEngine.play()>播放</button><button class=sort-btn onclick=PyVizEngine.pause()>暂停</button><button class=sort-btn onclick=PyVizEngine.prev()>上一步</button><button class=sort-btn onclick=PyVizEngine.next()>下一步</button><button class=sort-btn onclick=PyVizEngine.reset()>重置</button></div>"
+      + "</div></div>"
+      + "<div class=code-demo-col><div class=code-demo-col-header>示例代码</div>"
+      + "<textarea id=inlineCodeEditor class=code-demo-editor spellcheck=false>"+py_code+"</textarea>"
+      + "<div class=code-demo-actions><button id=inlineRunBtn class=code-demo-run onclick=runInlineCode()>运行代码</button><span id=inlineRunStatus class=code-demo-status></span></div>"
+      + "<pre id=inlineCodeOutput class=code-demo-output></pre></div>"
+      + "</div>"
+      + "<div class=viz-tabs><button class='viz-tab active' onclick=switchVizTab('detail',this)>知识详解</button><button class=viz-tab onclick=switchVizTab('practice',this)>去题库练习</button></div>"
+      + "<div id=viz-tab-content><div class=viz-detail-content><div class=viz-detail-body>"+py_expl+"</div></div><div class=viz-practice-content style=display:none>"+py_probs+"</div></div>"
+      + "</div>";
+    setTimeout(function() {
+      var canvas = document.getElementById("pyVizCanvas");
+      if (canvas && typeof PyVizEngine !== "undefined") {
+        PyVizEngine.init(canvas);
+        PyVizEngine.generateSteps(py_algo.kpId, py_algo);
+        PyVizEngine.draw(); PyVizEngine.speed = 3;
+        setTimeout(function() { PyVizEngine.play(); }, 600);
+      }
+    }, 120);
+    return;
+  }
+
+
     // Python course: py-viz renderer (handled by dedicated engine)
   if (ch.courseId === "python") {
     // pyVizMap and PyVizEngine from py-viz/py-core-viz.js handle all rendering
