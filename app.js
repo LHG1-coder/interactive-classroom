@@ -10279,13 +10279,14 @@ async function clabRun() {
   out.textContent = '';
 
   try {
+    const stdinText = (document.getElementById('clabStdinArea') || {}).value || '';
     const submitRes = await fetch(JUDGE0_URL + '/submissions?base64_encoded=true&wait=false', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        source_code: code,
+        source_code: btoa(unescape(encodeURIComponent(code))),
         language_id: JUDGE0_LANG_ID[lang] || 50,
-        stdin: (document.getElementById('clabStdinArea') || {}).value || '',
+        stdin: btoa(unescape(encodeURIComponent(stdinText))),
         cpu_time_limit: 15,
         memory_limit: 512000
       })
@@ -10302,20 +10303,23 @@ async function clabRun() {
     }
     if (!result) throw new Error('获取结果超时');
 
+    /* base64 解码输出字段 */
+    const dec = function (s) { try { return s ? decodeURIComponent(escape(atob(s))) : s; } catch (e) { return s; } };
+
     const statusId = result.status ? result.status.id : 0;
     if (statusId === 3) {
       out.style.color = '#86efac';
-      out.textContent = result.stdout || '（无输出）';
+      out.textContent = dec(result.stdout) || '（无输出）';
       status.textContent = '✓ 运行成功';
       status.style.color = '#86efac';
     } else if (statusId === 6) {
       out.style.color = '#f87171';
-      out.textContent = '编译错误:\n' + (result.compile_output || '未知错误');
+      out.textContent = '编译错误:\n' + (dec(result.compile_output) || '未知错误');
       status.textContent = '✗ 编译错误';
       status.style.color = '#f87171';
     } else {
       out.style.color = '#f87171';
-      out.textContent = result.stderr || result.message || '运行异常';
+      out.textContent = dec(result.stderr) || dec(result.message) || '运行异常';
       status.textContent = '⚠ 运行错误';
       status.style.color = '#f87171';
     }
