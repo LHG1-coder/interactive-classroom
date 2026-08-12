@@ -7507,6 +7507,7 @@ function openFavorite(key) {
   if (!f) return;
   state.currentCourse = coursesData.find(c => c.id === f.courseId) || state.currentCourse;
   state.currentChapter = f.ch;
+  navigate('courses');
   openVizView(f.chNum, f.kpIdx);
 }
 function updateFavBadge() {
