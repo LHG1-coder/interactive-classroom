@@ -3125,3 +3125,18 @@ body.light-theme .katex { color: #1a1a2e; }
   color: rgba(94,234,212,0.5);
   font-size: 14px;
 }
+/* ═══════ 个人中心 - 成就卡片 ═══════ */
+.achievements-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:10px; padding:8px 0; }
+.ach-card { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; background:var(--bg-active); border:1px solid var(--border-med); transition:all .2s; }
+.ach-card:hover { border-color:var(--border-bright); transform:translateY(-1px); }
+.ach-card.locked { opacity:0.45; }
+.ach-card-icon { font-size:22px; flex-shrink:0; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:8px; background:rgba(255,255,255,.06); }
+.ach-card-icon.dim { filter:grayscale(1); opacity:0.5; }
+.ach-card-info { flex:1; min-width:0; }
+.ach-card-name { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ach-card-desc { font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ach-card-date { font-size:10px; color:var(--text-muted); margin-top:2px; opacity:.7; }
+.ach-card-badge { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; flex-shrink:0; border:1px solid transparent; letter-spacing:.03em; }
+.ach-card-badge.locked-badge { background:transparent; border:none; font-size:12px; }
+.card-link { font-size:.8rem; color:var(--text-muted); text-decoration:none; transition:color .2s; }
+.card-link:hover { color:var(--accent); }

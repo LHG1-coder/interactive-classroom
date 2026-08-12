@@ -7499,6 +7499,8 @@ function navigate(page) {
 
   // render KaTeX for pages that may contain math
 
+  if (page === 'profile') { setTimeout(function() { renderProfileAchievements(); }, 120); }
+
   if (page === 'dashboard' || page === 'chat' || page === 'community' || page === 'lab' || page === 'questions') {
 
     setTimeout(function(){ renderMath(); }, 200);
@@ -7508,6 +7510,43 @@ function navigate(page) {
 }
 
 
+
+/* ═══════ 个人中心成就渲染 ═══════ */
+function renderProfileAchievements() {
+  var grid = document.getElementById("profile-achievements");
+  if (!grid) return;
+  if (!window.Achievements || !window.Achievements.getAll) { return; }
+  var ach = window.Achievements;
+  var all = ach.getAll();
+  var total = all.length;
+  var unlocked = ach.getUnlockedCount();
+  var achState = ach.getState();
+  var pct = total > 0 ? Math.round(unlocked/total*100) : 0;
+  var cfg = {
+    legendary:{bg:"rgba(207,181,59,0.12)",bd:"rgba(207,181,59,0.45)",cl:"#cfb53b",lb:"传说"},
+    epic:{bg:"rgba(123,47,190,0.12)",bd:"rgba(123,47,190,0.45)",cl:"#a78bfa",lb:"史诗"},
+    rare:{bg:"rgba(33,150,243,0.1)",bd:"rgba(33,150,243,0.4)",cl:"#60a5fa",lb:"稀有"},
+    common:{bg:"rgba(76,175,80,0.08)",bd:"rgba(76,175,80,0.35)",cl:"#86efac",lb:"普通"}
+  };
+  var h="";
+  all.forEach(function(a){
+    var ok=!!achState.unlocked[a.id];
+    var c=cfg[a.rarity]||cfg.common;
+    var dt=achState.unlockedDates[a.id]||"";
+    h+="<div class=ach-card"+(ok?" unlocked":" locked")+" style="+(ok?"border-color:"+c.bd+";background:"+c.bg:"")+">"
+      +"<div class=ach-card-icon"+(ok?"":" dim")+">"+a.icon+"</div>"
+      +"<div class=ach-card-info>"
+      +"<div class=ach-card-name style=color:"+(ok?"#f0f0f5":"var(--text-muted)")+">"+a.name+"</div>"
+      +"<div class=ach-card-desc>"+a.desc+"</div>"
+      +(ok?"<div class=ach-card-date>"+dt+"</div>":"")
+      +"</div>"
+      +(ok?"<span class=ach-card-badge style=background:"+c.bg+";color:"+c.cl+";border-color:"+c.bd+">"+c.lb+"</span>":"<span class=ach-card-badge locked-badge>@</span>")
+      +"</div>";
+  });
+  var hd=document.querySelector("#page-profile .card-title");
+  if(hd) hd.innerHTML="成就系统 <span style=font-size:0.75rem;color:var(--text-muted);font-weight:400>"+unlocked+"/"+total+" ("+pct+"%)</span>";
+  grid.innerHTML=h;
+}
 
 function updatePageTitle(page) {
 

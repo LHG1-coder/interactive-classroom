@@ -392,6 +392,7 @@
     getUnlocked() { return Object.keys(state.unlocked); },
     getUnlockedCount() { return Object.keys(state.unlocked).length; },
     getTotal() { return achievements.length; },
+    getAll() { return achievements.map(function(a) { return { id:a.id, name:a.name, desc:a.desc, icon:a.icon, rarity:a.rarity, cat:a.cat }; }); },
   };
 
   // ═══════════════ INIT ═══════════════
