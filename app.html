@@ -88,6 +88,16 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
         </svg>
         <span>社区</span>
       </a>
+      <a class="nav-item" data-page="algo" onclick="navigate('algo')">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none">
+          <circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="19" cy="6" r="2" stroke="currentColor" stroke-width="1.8"/>
+          <circle cx="12" cy="18" r="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M7 6h10M6.5 7.5 10.8 16M17.5 7.5 13.2 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span>算法可视化</span>
+        <span class="badge" style="background:#10b981">NEW</span>
+      </a>
 
       <div class="nav-section-label" style="margin-top:16px">个人</div>
       <a class="nav-item" data-page="favorites" onclick="navigate('favorites')">
@@ -1019,6 +1029,132 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
           </div>
         </div>
       </div>
+
+      <!-- ═══════════════ 算法可视化 ═══════════════ -->
+      <div id="page-algo" class="page">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">算法可视化实验室</h1>
+            <p class="page-subtitle">写代码时看着算法跑起来 —— 路径查找动画 + 代码逐步高亮 + 排序演示</p>
+          </div>
+        </div>
+
+        <div class="viz-tabs" style="margin-bottom:16px">
+          <button class="viz-tab active" id="algoTabPath" onclick="switchAlgoTab('path',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="19" cy="6" r="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="18" r="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 6h10M6.5 7.5 10.8 16M17.5 7.5 13.2 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 路径查找</button>
+          <button class="viz-tab" id="algoTabSort" onclick="switchAlgoTab('sort',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 排序算法</button>
+        </div>
+
+        <!-- 路径查找面板 -->
+        <div id="algo-pf-panel">
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <div class="algo-title-area">
+                <h2>网格路径查找</h2>
+                <p>在网格中画出障碍墙，观察不同搜索算法如何从起点（绿）找到终点（红）。拖动起点/终点可重新定位。</p>
+              </div>
+              <div class="algo-algo-picker">
+                <button class="algo-algo-btn active" data-algo="astar" onclick="AlgoVizEngine.setAlgo('astar')">A*</button>
+                <button class="algo-algo-btn" data-algo="dijkstra" onclick="AlgoVizEngine.setAlgo('dijkstra')">Dijkstra</button>
+                <button class="algo-algo-btn" data-algo="bfs" onclick="AlgoVizEngine.setAlgo('bfs')">BFS</button>
+                <button class="algo-algo-btn" data-algo="dfs" onclick="AlgoVizEngine.setAlgo('dfs')">DFS</button>
+                <button class="algo-algo-btn" data-algo="greedy" onclick="AlgoVizEngine.setAlgo('greedy')">贪心</button>
+              </div>
+            </div>
+            <div class="pf-layout">
+              <div class="pf-grid-col">
+                <div class="pf-grid-wrap">
+                  <div class="pf-grid" id="pfGrid"></div>
+                </div>
+                <div class="pf-legend">
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#22c55e"></i>起点</span>
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#ef4444"></i>终点</span>
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#475569"></i>墙</span>
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#3b82f6"></i>已访问</span>
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#f59e0b"></i>前沿队列</span>
+                  <span class="pf-legend-item"><i class="pf-legend-dot" style="background:#10b981"></i>最短路径</span>
+                </div>
+                <div class="pf-stats" id="pfStats"></div>
+              </div>
+              <div class="pf-code-col">
+                <div class="pf-code-header">
+                  <span id="pfAlgoName">A* 搜索</span> 伪代码 · 逐步高亮
+                </div>
+                <div class="pf-code" id="pfCode"></div>
+                <div class="pf-algo-desc" id="pfAlgoDesc"></div>
+              </div>
+            </div>
+
+            <div class="sort-progress-wrap" style="margin-top:14px">
+              <div class="sort-progress-bar"><div class="sort-progress-fill" id="pfProgressFill"></div></div>
+            </div>
+            <div class="sort-step-info" id="pfStepInfo">点击/拖拽画墙，右键擦除，可拖动起点与终点</div>
+
+            <div class="pf-toolbar">
+              <div class="pf-toolbar-group">
+                <button class="sort-btn sort-btn-reset" onclick="AlgoVizEngine.reset()" title="重置动画"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2"/><path d="M3.51 15a9 9 0 1 0 .49-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                <button class="sort-btn sort-btn-prev" onclick="AlgoVizEngine.prev()" title="上一步">◀</button>
+                <button class="sort-btn sort-btn-play" id="pfPlayBtn" onclick="if(AlgoVizEngine.playing)AlgoVizEngine.pause();else AlgoVizEngine.play()">▶ 播放</button>
+                <button class="sort-btn sort-btn-next" onclick="AlgoVizEngine.next()" title="下一步">▶</button>
+                <div class="sort-speed-wrap">
+                  <label style="font-size:11px;color:#94a3b8">速度 <span id="pfSpeedVal">3</span></label>
+                  <input type="range" id="pfSpeedRange" min="1" max="10" value="3" step="1" style="width:70px;accent-color:#6366f1" oninput="AlgoVizEngine.speed=+this.value;document.getElementById('pfSpeedVal').textContent=this.value">
+                </div>
+              </div>
+              <div class="pf-toolbar-group">
+                <button class="pf-btn" onclick="AlgoVizEngine.randomWalls()">🎲 随机墙</button>
+                <button class="pf-btn" onclick="AlgoVizEngine.clearWalls()">🧹 清空墙</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 排序面板 -->
+        <div id="algo-sort-panel" style="display:none">
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <div class="algo-title-area">
+                <h2 id="algoSortName">冒泡排序 演示</h2>
+                <p>经典排序算法动画：左侧柱状图展示比较/交换/归位过程，右侧附 C 语言实现，可复制到代码实验室运行。</p>
+              </div>
+              <div class="algo-algo-picker">
+                <select id="algoSortSelect" class="algo-sort-select" onchange="algoSortSelect(this.value)">
+                  <option value="bubble">冒泡排序</option>
+                  <option value="insertion">直接插入排序</option>
+                  <option value="selection">简单选择排序</option>
+                  <option value="merge">归并排序</option>
+                  <option value="quick">快速排序</option>
+                  <option value="radix">基数排序</option>
+                </select>
+              </div>
+            </div>
+            <div class="sort-dual-wrap">
+              <div class="sort-anim-col">
+                <div class="sort-anim-header"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="5 3 19 12 5 21" fill="currentColor"/></svg> 排序过程动画</div>
+                <canvas id="algoSortCanvas" style="display:block;width:100%;border-radius:10px;background:#0f172a"></canvas>
+                <div class="sort-progress-wrap"><div class="sort-progress-bar"><div class="sort-progress-fill" id="algoSortProgressFill"></div></div></div>
+                <div class="sort-step-info" id="algoSortStepInfo">准备中...</div>
+                <div class="sort-controls">
+                  <button class="sort-btn sort-btn-reset" onclick="algoSortCmd('reset')" title="重置"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2"/><path d="M3.51 15a9 9 0 1 0 .49-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                  <button class="sort-btn sort-btn-prev" onclick="algoSortCmd('prev')">◀</button>
+                  <button class="sort-btn sort-btn-play" id="algoSortPlayBtn" onclick="algoSortCmd('play')">▶ 播放</button>
+                  <button class="sort-btn sort-btn-next" onclick="algoSortCmd('next')">▶</button>
+                  <div class="sort-speed-wrap"><label style="font-size:11px;color:#94a3b8">速度 <span id="algoSortSpeedVal">1</span></label>
+                  <input type="range" id="algoSortSpeedRange" min="1" max="10" value="1" step="1" style="width:70px;accent-color:#6366f1" oninput="SortEngine.speed=+this.value;document.getElementById('algoSortSpeedVal').textContent=this.value"></div>
+                </div>
+              </div>
+              <div class="sort-code-col">
+                <div class="sort-code-header"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> C语言实现</div>
+                <textarea id="algoSortCode" class="code-demo-editor sort-code-editor" spellcheck="false"></textarea>
+                <div class="code-demo-actions">
+                  <button class="code-demo-run" onclick="algoRunCode()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> 运行演示</button>
+                  <span class="code-demo-status" id="algoSortRunStatus"></span>
+                </div>
+                <pre id="algoSortOutput" class="code-demo-output sort-code-output"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -1052,6 +1188,7 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
   <script>let globalMemoryArrows = new Map();</script>
   <script src="ds-viz/coding-lab.js"></script>
   <script src="py-viz/py-core-viz.js"></script>
+  <script src="ds-viz/algo-viz.js"></script>
 
   <!-- ═══════════════ 悬浮 AI 助手 ═══════════════ -->
   <!-- 悬浮触发按钮 -->

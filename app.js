@@ -7446,6 +7446,17 @@ function navigate(page) {
 
   }
 
+  // 算法可视化: 进入时初始化引擎，离开时停止动画
+  if (page === 'algo') {
+
+    setTimeout(function () { if (window.initAlgoPage) initAlgoPage(); }, 60);
+
+  } else if (window.stopAlgoViz) {
+
+    stopAlgoViz();
+
+  }
+
   // render KaTeX for pages that may contain math
 
   if (page === 'dashboard' || page === 'chat' || page === 'community' || page === 'lab' || page === 'questions') {
@@ -7460,7 +7471,7 @@ function navigate(page) {
 
 function updatePageTitle(page) {
 
-  const titles = { dashboard:'仪表盘', chat:'AI 辅导', courses:'课程中心', lab:'公式实验室', community:'社区', questions:'课程题库', profile:'个人中心', settings:'设置', favorites:'我的收藏' };
+  const titles = { dashboard:'仪表盘', chat:'AI 辅导', courses:'课程中心', lab:'公式实验室', community:'社区', questions:'课程题库', profile:'个人中心', settings:'设置', favorites:'我的收藏', algo:'算法可视化' };
 
   document.title = `${titles[page]||page} · 互动课堂`;
 

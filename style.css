@@ -2727,3 +2727,196 @@ body.light-theme .katex { color: #1a1a2e; }
 }
 
 
+
+/* ═══════════════════════════════════════════════
+   算法可视化实验室 · 路径查找 (pf-*)
+   ═══════════════════════════════════════════════ */
+.algo-card {
+  background: var(--card-bg, #1e1e2e);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.algo-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.algo-title-area h2 { margin: 0 0 4px; font-size: 16px; color: var(--text, #f0f2f8); }
+.algo-title-area p { margin: 0; font-size: 12.5px; color: #94a3b8; line-height: 1.6; }
+.algo-algo-picker { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.algo-algo-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: transparent;
+  color: #a5b4fc;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.algo-algo-btn:hover { background: rgba(99, 102, 241, 0.12); }
+.algo-algo-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; }
+.algo-sort-select {
+  background: #16161f;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #e2e8f0;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.algo-sort-select:focus { border-color: #6366f1; }
+
+/* 双栏布局 */
+.pf-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .pf-layout { grid-template-columns: 1fr; }
+}
+
+/* 网格 */
+.pf-grid-wrap {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px;
+}
+.pf-grid {
+  display: grid;
+  gap: 2px;
+  user-select: none;
+  touch-action: none;
+}
+.pf-cell {
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: #1e293b;
+  cursor: pointer;
+  transition: background .09s;
+  position: relative;
+}
+.pf-cell:hover { background: #334155; }
+.pf-cell.wall { background: #64748b; }
+.pf-cell.wall:hover { background: #7c8ca3; }
+.pf-cell.visited { background: #3b82f6; animation: pfPop .22s; }
+.pf-cell.frontier { background: #f59e0b; animation: pfPop .18s; }
+.pf-cell.path { background: #10b981; animation: pfPop .22s; }
+.pf-cell.current { box-shadow: inset 0 0 0 2px #facc15; }
+.pf-cell.start { background: #22c55e; cursor: grab; }
+.pf-cell.start:hover { background: #4ade80; }
+.pf-cell.end { background: #ef4444; cursor: grab; }
+.pf-cell.end:hover { background: #f87171; }
+@keyframes pfPop {
+  from { transform: scale(.55); }
+  to { transform: scale(1); }
+}
+
+/* 图例 */
+.pf-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+}
+.pf-legend-item { display: flex; align-items: center; gap: 5px; }
+.pf-legend-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+/* 统计 */
+.pf-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+}
+.pf-stat { display: flex; align-items: center; gap: 5px; }
+.pf-stat i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.pf-stat b { color: #f0f2f8; }
+
+/* 伪代码面板 */
+.pf-code-col { min-width: 0; }
+.pf-code-header {
+  font-size: 12px;
+  color: #a5b4fc;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.pf-code {
+  background: #0f172a;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.75;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.pf-code-line {
+  display: block;
+  color: #94a3b8;
+  padding: 0 8px;
+  border-radius: 4px;
+  white-space: pre;
+  transition: background .15s;
+}
+.pf-code-line.hl {
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  border-left: 2px solid #f59e0b;
+  margin-left: -2px;
+}
+.pf-ln {
+  display: inline-block;
+  width: 26px;
+  color: #475569;
+  text-align: right;
+  margin-right: 10px;
+  user-select: none;
+}
+.pf-code-line.hl .pf-ln { color: #f59e0b; }
+.pf-algo-desc {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #94a3b8;
+  padding: 8px 12px;
+  background: rgba(99, 102, 241, 0.07);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+/* 工具栏 */
+.pf-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.pf-toolbar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pf-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.08);
+  color: #a5b4fc;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.pf-btn:hover { background: rgba(99, 102, 241, 0.2); color: #fff; }
