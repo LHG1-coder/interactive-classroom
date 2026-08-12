@@ -10410,11 +10410,16 @@ function _clabBindModalEvents() {
   });
   okBtn.addEventListener('click', function () { _clabModalCommit(true); });
   skipBtn.addEventListener('click', function () { _clabModalCommit(false); });
-  if (closeBtn) closeBtn.addEventListener('click', function () { _clabModalCommit(false); });
+  if (closeBtn) closeBtn.addEventListener('click', function () { clabRunModalSkip(); });
+  /* Esc 无条件关闭（运行前/运行后都生效） */
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape' && _clabModalCtx && document.getElementById('clabRunModal').style.display === 'flex') {
-      _clabModalCommit(false);
+    if (e.key === 'Escape' && document.getElementById('clabRunModal').style.display === 'flex') {
+      clabRunModalSkip();
     }
+  });
+  /* 点击背景（非窗口区域）关闭 */
+  modal.addEventListener('mousedown', function (e) {
+    if (e.target === modal) clabRunModalSkip();
   });
 }
 
