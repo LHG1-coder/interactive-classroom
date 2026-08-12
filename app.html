@@ -664,6 +664,24 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
               </div>
             </div>
           </div>
+          <!-- 运行输入弹窗（点击 ▶ 运行且 stdin 为空时弹出） -->
+          <div id="clabRunModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:10000;align-items:center;justify-content:center">
+            <div style="width:min(520px,92vw);background:#1e1f1c;border:1px solid #fd971f;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden">
+              <div style="padding:12px 18px;background:#272822;border-bottom:1px solid #3e3d32;display:flex;align-items:center;gap:10px">
+                <span style="font-size:1.05rem;color:#fd971f;font-weight:600">📥 程序需要输入</span>
+                <span style="margin-left:auto;color:#75715e;font-size:0.82rem;cursor:pointer" onclick="clabRunModalSkip()">✕</span>
+              </div>
+              <div style="padding:16px 18px">
+                <div style="font-size:0.82rem;color:#a6e22e;margin-bottom:8px">程序通过 <code style="color:#f92672">scanf</code> / <code style="color:#f92672">cin</code> 等待数据。请输入测试数据，每行一条：</div>
+                <textarea id="clabRunModalInput" rows="5" placeholder="例如：&#10;10&#10;hello world" style="display:block;width:100%;padding:10px 12px;background:#0c0c0c;color:#cccccc;border:1px solid #3e3d32;border-radius:6px;font-family:'Fira Code','Consolas',monospace;font-size:0.88rem;line-height:1.5;outline:none;resize:vertical"></textarea>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+                  <button onclick="clabRunModalSkip()" style="padding:8px 16px;background:transparent;color:#75715e;border:1px solid #3e3d32;border-radius:6px;cursor:pointer;font-size:0.85rem">不输入，直接运行</button>
+                  <button id="clabRunModalOk" style="padding:8px 18px;background:#fd971f;color:#272822;border:none;border-radius:6px;cursor:pointer;font-size:0.88rem;font-weight:600">▶ 运行（输入回车）</button>
+                </div>
+                <div style="margin-top:8px;font-size:0.74rem;color:#75715e">💡 提示：焦点在输入框时按 <strong>Enter</strong> 直接运行；按 <strong>Esc</strong> 取消</div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>

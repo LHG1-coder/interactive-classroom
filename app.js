@@ -10260,7 +10260,17 @@ async function clabRun() {
   if (!ta || !out) return;
 
   const code = ta.value;
-  if (!code.trim()) { out.textContent = '请先编写代码'; return; }
+  if (!code.trim()) { out.innerHTML = '<span style="color:#75715e">（请先编写代码）</span>'; status.textContent='⚠ 等待输入'; status.style.color='#fbbf24'; return; }
+
+  /* 智能弹出输入框：检测代码是否需要 stdin 输入（scanf/cin/gets/getline/getchar 等） */
+  const needsStdin = /\b(scanf|cin\s*>>|cin\s*>>|gets\s*\(|getline\s*\(|getchar\s*\(|readline|read\s*\(|input\s*\()/.test(code);
+  const stdinEl = document.getElementById('clabStdinArea');
+  if (needsStdin && stdinEl && !stdinEl.value.trim()) {
+    await new Promise(function (resolve) {
+      clabRunModalOpen(resolve);
+    });
+    /* resolve 后继续执行（modal 关闭按钮或确定按钮都会调用 resolve） */
+  }
 
   /* ① 可视化引擎：CMiniInterpreter 解析（即使失败也不影响 Judge0） */
   if (_codingLab) {
@@ -10350,6 +10360,53 @@ async function clabRun() {
     btn.disabled = false;
     btn.textContent = prevText || '▶ 运行';
   }
+}
+
+/* ═══════ 运行输入弹窗（点击运行且需要输入时弹出）═══════ */
+let _clabModalResolve = null;
+
+function clabRunModalOpen(resolve) {
+  const modal = document.getElementById('clabRunModal');
+  const input = document.getElementById('clabRunModalInput');
+  const okBtn = document.getElementById('clabRunModalOk');
+  if (!modal || !input) { resolve(); return; }
+
+  _clabModalResolve = resolve;
+  input.value = '';
+  modal.style.display = 'flex';
+  setTimeout(function () { input.focus(); }, 30);
+
+  function cleanup() {
+    modal.style.display = 'none';
+    input.removeEventListener('keydown', onKey);
+    okBtn.removeEventListener('click', onOk);
+    document.removeEventListener('keydown', onEsc);
+    _clabModalResolve = null;
+  }
+
+  function onOk() {
+    const stdinEl = document.getElementById('clabStdinArea');
+    if (stdinEl) stdinEl.value = input.value;
+    const r = _clabModalResolve; cleanup(); if (r) r();
+  }
+
+  function onEsc(e) { if (e.key === 'Escape') { onSkip(); } }
+
+  function onKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onOk(); }
+  }
+
+  function onSkip() {
+    const stdinEl = document.getElementById('clabStdinArea');
+    if (stdinEl) stdinEl.value = '';
+    const r = _clabModalResolve; cleanup(); if (r) r();
+  }
+
+  input.addEventListener('keydown', onKey);
+  okBtn.addEventListener('click', onOk);
+  document.addEventListener('keydown', onEsc);
+  /* 把 onSkip 暴露给按钮 onclick */
+  window.clabRunModalSkip = onSkip;
 }
 
 // 编辑触发自动运行（debounce 后调用）
