@@ -6896,6 +6896,21 @@ function navigateAdjacentKP(delta) {
 
 
 function renderVizView(ch, kp) {
+  // Python course: py-viz renderer (minimal edition, no inner quote conflicts)
+  if (ch.courseId === 'python') {
+    var pe = document.getElementById('viz-view');
+    var pk = getKPDetail(ch.courseId, ch.num, ch.kps.indexOf(kp));
+    var ex = pk && pk.explanation ? pk.explanation.split(String.fromCharCode(10)).join('<br>') : '暂无详细讲解。';
+    pe.innerHTML =
+      '<div class=view-back-bar><button class=view-back-btn onclick=backToKP()>返回知识点</button><span class=view-back-title>第'+ch.num+'章 '+kp.name+'</span></div>'+
+      '<div class=viz-panel>'+
+        '<div class=viz-header><div class=viz-icon-lg style=background:#3776AB22;color:#3776AB>PY</div><div class=viz-title-area><h2>'+kp.name+'</h2><p>'+kp.desc+'</p></div></div>'+
+        '<div class=viz-detail-content><div class=viz-detail-body>'+ex+'</div></div>'+
+      '</div>';
+    return;
+  }
+
+
   // Python course: dedicated py-viz renderer (prevents generic math viz fallback)
   if (ch.courseId === "python") {
     var py_el = document.getElementById("viz-view");
