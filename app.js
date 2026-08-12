@@ -10172,11 +10172,12 @@ function openCodingLab() {
       }
     });
 
-    // 输入事件：语法高亮 + 内存解析
+    // 输入事件：语法高亮 + 内存解析 + 自动备份到本地
     ta.addEventListener('input', function() {
       _refreshHighlight();
       clearTimeout(liveTimer);
       liveTimer = setTimeout(() => _autoRunClab(), 200);
+      if (typeof _clabAutoSave === 'function') _clabAutoSave();
     });
 
     // 滚动同步
@@ -10190,6 +10191,9 @@ function openCodingLab() {
   _codingLab.reset();
   _updateClabStepInfo();
   _refreshHighlight();
+
+  /* 恢复上次自动保存的代码（如果有） */
+  if (typeof _clabRestore === 'function') _clabRestore();
 }
 
 function closeCodingLab() {
@@ -10422,6 +10426,139 @@ function clabLoadExample(id) {
     if (out) out.textContent = '';
     if (sel) sel.value = '';
   }
+}
+
+/* ═══════ 💾 保存 / 📂 打开 代码文件（磁盘） ═══════ */
+const CLAB_STORE_KEY = 'hdt_clab_code_v1';
+
+function clabSaveToDisk() {
+  const ta = document.getElementById('clabCodeArea');
+  if (!ta) return;
+  const code = ta.value;
+  if (!code.trim()) { _clabToast('代码为空，先写点东西再保存吧~'); return; }
+  const sel = document.getElementById('clabCodeLangSelect');
+  const lang = sel ? sel.value : 'c';
+  const ext = lang === 'c' ? 'c' : (lang === 'python3' ? 'py' : 'cpp');
+  const defaultName = 'main.' + ext;
+
+  /* 优先：File System Access API（Chrome/Edge，可自由选择保存到任意磁盘位置） */
+  if (window.showSaveFilePicker) {
+    showSaveFilePicker({
+      suggestedName: defaultName,
+      types: [{ description: '源代码文件', accept: { 'text/plain': ['.' + ext] } }]
+    }).then(async function (handle) {
+      const writable = await handle.createWritable();
+      await writable.write(code);
+      await writable.close();
+      _clabToast('✓ 已保存到磁盘：' + (handle.name || defaultName));
+    }).catch(function (err) {
+      if (err && err.name !== 'AbortError') _clabToast('⚠ 保存失败: ' + err.message);
+    });
+    return;
+  }
+
+  /* 降级：直接下载到浏览器下载目录 */
+  const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = defaultName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+  _clabToast('✓ 已保存（建议使用 Chrome/Edge 可选择保存位置）');
+}
+
+function clabOpenFromDisk() {
+  const ta = document.getElementById('clabCodeArea');
+  if (!ta) return;
+
+  /* 优先：File System Access API */
+  if (window.showOpenFilePicker) {
+    showOpenFilePicker({
+      types: [{ description: '源代码文件', accept: { 'text/plain': ['.c', '.cpp', '.cc', '.cxx', '.h', '.hpp', '.py', '.txt'] } }],
+      multiple: false
+    }).then(async function (handles) {
+      const file = await handles[0].getFile();
+      const text = await file.text();
+      _clabLoadCode(text, file.name);
+    }).catch(function (err) {
+      if (err && err.name !== 'AbortError') _clabToast('⚠ 打开失败: ' + err.message);
+    });
+    return;
+  }
+
+  /* 降级：隐藏 file input */
+  let inp = document.getElementById('clabFileInput');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.id = 'clabFileInput';
+    inp.accept = '.c,.cpp,.cc,.cxx,.h,.hpp,.py,.txt';
+    inp.style.display = 'none';
+    inp.addEventListener('change', function () {
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = function (e) { _clabLoadCode(String(e.target.result || ''), f.name); };
+      reader.readAsText(f);
+    });
+    document.body.appendChild(inp);
+  }
+  inp.click();
+}
+
+/* 加载代码到编辑器（按扩展名智能切换语言） */
+function _clabLoadCode(text, fileName) {
+  const ta = document.getElementById('clabCodeArea');
+  if (!ta) return;
+  ta.value = text;
+  const sel = document.getElementById('clabCodeLangSelect');
+  if (sel && fileName) {
+    const ext = fileName.split('.').pop().toLowerCase();
+    if (ext === 'c') sel.value = 'c';
+    else if (ext === 'py') sel.value = 'python3';
+    else if (/^(cpp|cc|cxx|h|hpp)$/.test(ext)) sel.value = 'cpp17';
+  }
+  ta.dispatchEvent(new Event('input'));
+  const out = document.getElementById('clabOutput');
+  if (out) out.textContent = '';
+  _clabToast('✓ 已打开 ' + (fileName || '代码文件'));
+}
+
+/* 轻量 toast 提示 */
+function _clabToast(msg) {
+  let t = document.getElementById('clabToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'clabToast';
+    t.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#272822;color:#e6db74;border:1px solid #fd971f;padding:8px 18px;border-radius:8px;font-size:0.82rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.4);transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function () { t.style.opacity = '0'; }, 2200);
+}
+
+/* 编辑时自动备份到浏览器本地（刷新/重开自动恢复，防止丢失） */
+function _clabAutoSave() {
+  try {
+    const ta = document.getElementById('clabCodeArea');
+    if (ta) localStorage.setItem(CLAB_STORE_KEY, ta.value);
+  } catch (e) {}
+}
+
+function _clabRestore() {
+  try {
+    const ta = document.getElementById('clabCodeArea');
+    if (!ta) return;
+    const saved = localStorage.getItem(CLAB_STORE_KEY);
+    if (saved && saved.trim()) {
+      ta.value = saved;
+      ta.dispatchEvent(new Event('input'));
+    }
+  } catch (e) {}
 }
 
 /* ═══════ C/C++ 代码示例映射 ═══════ */

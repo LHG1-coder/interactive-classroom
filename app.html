@@ -613,6 +613,8 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
                   <input type="range" id="clabSpeedRange" min="1" max="10" value="3" step="1" style="width:56px;accent-color:#fd971f" oninput="clabSpeedChange(this.value)">
                 </div>
                 <span style="width:1px;height:18px;background:#3e3d32"></span>
+                <button class="btn btn-outline" style="padding:0.4rem 0.7rem;font-size:0.82rem" onclick="clabSaveToDisk()" title="保存代码到本地磁盘（.c/.cpp 文件）">💾 保存</button>
+                <button class="btn btn-outline" style="padding:0.4rem 0.7rem;font-size:0.82rem" onclick="clabOpenFromDisk()" title="从本地磁盘打开代码文件">📂 打开</button>
                 <button id="clabRunBtn" class="btn btn-primary" style="padding:0.4rem 1rem;font-size:0.82rem;background:#fd971f;border-color:#fd971f" onclick="clabRun()">▶ 运行</button>
                 <button id="clabResetBtn" class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.82rem" onclick="clabReset()">↻ 重置</button>
                 <button class="btn btn-outline" style="padding:0.4rem 0.8rem;font-size:0.85rem" onclick="closeCodingLab()">关闭</button>
