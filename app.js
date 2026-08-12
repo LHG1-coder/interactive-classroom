@@ -10419,7 +10419,6 @@ function _clabBindModalEvents() {
 }
 
 function _clabModalCommit(withInput) {
-  if (!_clabModalCtx) return;
   const input = document.getElementById('clabRunModalInput');
   const stdinEl = document.getElementById('clabStdinArea');
   if (withInput && input && stdinEl) {
@@ -10427,13 +10426,26 @@ function _clabModalCommit(withInput) {
   } else if (!withInput && stdinEl) {
     stdinEl.value = '';                   /* 跳过 → 空 stdin */
   }
-  const r = _clabModalCtx.resolve;
-  _clabModalCtx = null;
-  if (r) r();
+  /* 总是关闭窗口（运行前/运行后都能关） */
+  const modal = document.getElementById('clabRunModal');
+  if (modal) modal.style.display = 'none';
+  if (_clabModalCtx) {
+    const r = _clabModalCtx.resolve;
+    _clabModalCtx = null;
+    if (r) r();
+  }
 }
 
-/* 兼容旧的点击调用（✕/跳过按钮在 HTML 中直接引用） */
-function clabRunModalSkip() { _clabModalCommit(false); }
+/* ✕ 关闭：无论运行前后都直接关窗（若在等待输入也释放 Promise 避免悬挂） */
+function clabRunModalSkip() {
+  const modal = document.getElementById('clabRunModal');
+  if (modal) modal.style.display = 'none';
+  if (_clabModalCtx) {
+    const r = _clabModalCtx.resolve;
+    _clabModalCtx = null;
+    if (r) r();
+  }
+}
 
 // 编辑触发自动运行（debounce 后调用）
 function _autoRunClab() {
