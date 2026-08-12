@@ -10303,24 +10303,42 @@ async function clabRun() {
     }
     if (!result) throw new Error('获取结果超时');
 
-    /* base64 解码输出字段 */
+    /* base64 解码输出字段 + 构造 IDE 风格多色输出 */
     const dec = function (s) { try { return s ? decodeURIComponent(escape(atob(s))) : s; } catch (e) { return s; } };
+    const escHtml = function (s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); };
 
     const statusId = result.status ? result.status.id : 0;
+    const statusDesc = result.status ? result.status.description : '';
+    const stdout = dec(result.stdout) || '';
+    const stderr = dec(result.stderr) || '';
+    const compileOutput = dec(result.compile_output) || '';
+    const time = result.time || '';
+    const mem = result.memory || '';
+    const exitMsg = time ? '✓ Process exited with return value 0 (' + time + 's' + (mem ? ', ' + mem + ' KB' : '') + ')' : '';
+
     if (statusId === 3) {
-      out.style.color = '#86efac';
-      out.textContent = dec(result.stdout) || '（无输出）';
+      out.style.color = '#cccccc';
+      let html = '';
+      if (compileOutput) html += '<span style="color:#9cdcfe">📋 编译信息:\n' + escHtml(compileOutput) + '\n</span>';
+      if (stdout) html += '<span style="color:#cccccc">📤 输出:\n' + escHtml(stdout) + '\n</span>';
+      if (exitMsg) html += '<span style="color:#4ec9b0">' + exitMsg + '\n</span>';
+      out.innerHTML = html || '<span style="color:#75715e">（无输出）</span>';
       status.textContent = '✓ 运行成功';
       status.style.color = '#86efac';
     } else if (statusId === 6) {
-      out.style.color = '#f87171';
-      out.textContent = '编译错误:\n' + (dec(result.compile_output) || '未知错误');
+      out.style.color = '#f48771';
+      out.innerHTML = '<span style="color:#f48771">✗ 编译错误:\n' + escHtml(compileOutput || '未知错误') + '\n</span>' +
+        (exitMsg ? '<span style="color:#4ec9b0">' + exitMsg + '</span>' : '');
       status.textContent = '✗ 编译错误';
       status.style.color = '#f87171';
     } else {
-      out.style.color = '#f87171';
-      out.textContent = dec(result.stderr) || dec(result.message) || '运行异常';
-      status.textContent = '⚠ 运行错误';
+      out.style.color = '#f48771';
+      let html = '<span style="color:#f48771">✗ ' + escHtml(statusDesc || '运行错误') + '\n';
+      if (stderr) html += escHtml(stderr);
+      if (exitMsg) html += '\n<span style="color:#4ec9b0">' + exitMsg + '</span>';
+      html += '</span>';
+      out.innerHTML = html;
+      status.textContent = '⚠ ' + (statusDesc || '运行错误');
       status.style.color = '#f87171';
     }
   } catch (err) {
