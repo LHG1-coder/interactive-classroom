@@ -10245,9 +10245,9 @@ async function clabRun() {
       body: JSON.stringify({
         source_code: code,
         language_id: JUDGE0_LANG_ID[lang] || 50,
-        stdin: '',
-        cpu_time_limit: 5,
-        memory_limit: 128000
+        stdin: (document.getElementById('clabStdinArea') || {}).value || '',
+        cpu_time_limit: 15,
+        memory_limit: 512000
       })
     });
     if (!submitRes.ok) throw new Error('Judge0 不可用 (HTTP ' + submitRes.status + ')');
@@ -12528,7 +12528,7 @@ async function runInlineCode(){
 
   try{
 
-    const resp=await fetch(JUDGE0_URL+'/submissions?base64_encoded=false&wait=true',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:code,language_id:lang,stdin:'',cpu_time_limit:5,memory_limit:128000})});
+    const resp=await fetch(JUDGE0_URL+'/submissions?base64_encoded=false&wait=true',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:code,language_id:lang,stdin:'',cpu_time_limit:15,memory_limit:512000})});
 
     const r=await resp.json();
 

@@ -643,6 +643,12 @@ successfully downloaded text file (SHA: 600aa86e5e56a89edc50dbf22cd9a53639b0bef5
                   🧠 实时内存视图
                 </div>
                 <div id="clabMemoryView" style="flex:1;overflow:auto;padding:8px;min-height:0"></div>
+                <!-- 标准输入区（折叠，避免占用空间） -->
+                <div style="padding:4px 14px;font-size:0.74rem;border-top:1px solid #3e3d32;display:flex;align-items:center;gap:8px">
+                  <button onclick="document.getElementById('clabStdinArea').style.display=document.getElementById('clabStdinArea').style.display==='none'?'block':'none'; this.textContent=document.getElementById('clabStdinArea').style.display==='none'?'📥 输入 ▼':'📥 输入 ▲'" style="background:none;border:none;color:#a6e22e;cursor:pointer;font-size:0.74rem;padding:0">📥 输入 ▼</button>
+                  <span style="color:#75715e">scanf / cin 等待的测试数据，留空 = 程序不需输入</span>
+                </div>
+                <textarea id="clabStdinArea" placeholder="例如：&#10;10&#10;hello world&#10;&#10;（留空表示程序不需要）" style="display:none;height:60px;margin:0;padding:8px 14px;border:none;border-top:1px solid #3e3d32;background:#1e1f1c;color:#e6db74;font-family:'Fira Code','Consolas',monospace;font-size:0.78rem;line-height:1.5;outline:none;resize:vertical"></textarea>
                 <!-- 运行输出区 -->
                 <div style="padding:6px 14px;font-size:0.78rem;color:#a6e22e;border-top:1px solid #3e3d32;border-bottom:1px solid #3e3d32;display:flex;justify-content:space-between">
                   <span>📤 运行输出</span>
