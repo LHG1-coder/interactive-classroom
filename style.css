@@ -2920,3 +2920,208 @@ body.light-theme .katex { color: #1a1a2e; }
   transition: all .15s;
 }
 .pf-btn:hover { background: rgba(99, 102, 241, 0.2); color: #fff; }
+
+/* ═══════ Python 课程专属视觉 — 官方品牌蓝黄几何 ═══════ */
+.chapter-card.course-python {
+  border: 1px solid rgba(55,118,171,0.25);
+  background: linear-gradient(180deg, rgba(55,118,171,0.08) 0%, rgba(255,212,59,0.03) 60%, transparent 100%);
+  position: relative; overflow: hidden;
+}
+.chapter-card.course-python::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(55,118,171,0.12) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(255,212,59,0.1) 0%, transparent 40%);
+}
+.chapter-card.course-python .cc-cover { position: relative; overflow: hidden; }
+.chapter-card.course-python .cc-cover::after {
+  content: 'PY'; position: absolute; top: 10px; right: 14px;
+  font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 22px;
+  color: rgba(255,255,255,0.3); letter-spacing: -0.04em; z-index: 1;
+}
+.chapter-card.course-python .cc-num {
+  font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em;
+  background: rgba(255,212,59,0.95); color: #0c0c0f;
+  padding: 3px 10px 3px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.chapter-card.course-python:hover {
+  border-color: rgba(255,212,59,0.6);
+  box-shadow: 0 8px 32px rgba(55,118,171,0.25), 0 0 0 1px rgba(255,212,59,0.4);
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgba(55,118,171,0.08) 0%, rgba(255,212,59,0.04) 100%);
+}
+.chapter-card.course-python .cc-body h3 { color: #f0f0f5; }
+.chapter-card.course-python .cc-body h3::before {
+  content: 'def '; color: #FFD43B; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-right: 2px;
+}
+.chapter-card.course-python .cc-body p { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #b0b5c0; }
+.chapter-card.course-python .cc-meta span { color: #a0a5b0; }
+
+/* Python 进度标签高亮 */
+.chapter-card.course-python .cc-meta-tag.progress {
+  background: linear-gradient(135deg, rgba(55,118,171,0.18), rgba(255,212,59,0.12));
+  color: #5eead4; border: 1px solid rgba(94,234,212,0.3); font-weight: 600;
+  padding: 3px 10px; border-radius: 4px; letter-spacing: 0.02em;
+}
+.chapter-card.course-python:has(.cc-meta-tag.progress) {
+  border-color: rgba(94,234,212,0.35); box-shadow: 0 4px 16px rgba(94,234,212,0.06);
+}
+.chapter-card.course-python:has(.cc-meta-tag.progress) .cc-cover::after {
+  content: 'IN PROGRESS'; color: rgba(94,234,212,0.5); font-size: 14px;
+}
+
+/* Python 已完成高亮 */
+.chapter-card.course-python .cc-meta-tag.done {
+  background: linear-gradient(135deg, rgba(255,212,59,0.2), rgba(55,118,171,0.15));
+  color: #FFD43B; border: 1px solid rgba(255,212,59,0.35); font-weight: 600;
+  padding: 3px 10px; border-radius: 4px; letter-spacing: 0.02em;
+  box-shadow: 0 0 12px rgba(255,212,59,0.15);
+}
+.chapter-card.course-python:has(.cc-meta-tag.done) {
+  border-color: rgba(255,212,59,0.45);
+  box-shadow: 0 4px 20px rgba(255,212,59,0.08), inset 0 1px 0 rgba(255,212,59,0.06);
+}
+.chapter-card.course-python:has(.cc-meta-tag.done) .cc-cover::after {
+  content: '\2713 DONE'; color: rgba(255,212,59,0.5); font-size: 16px;
+}
+.chapter-card.course-python:has(.cc-meta-tag.done):hover {
+  transform: none; border-color: rgba(255,212,59,0.6);
+  box-shadow: 0 6px 28px rgba(255,212,59,0.12), inset 0 1px 0 rgba(255,212,59,0.08);
+}
+
+
+/* ═══════ Python 课程专属视觉 — 官方品牌蓝黄几何 ═══════ */
+.chapter-card.course-python {
+  border: 1px solid rgba(55,118,171,0.3);
+  background: linear-gradient(180deg, rgba(55,118,171,0.04) 0%, transparent 60%);
+  position: relative;
+  overflow: hidden;
+}
+.chapter-card.course-python::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(55,118,171,0.08) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(255,212,59,0.06) 0%, transparent 40%);
+  pointer-events: none;
+}
+.chapter-card.course-python .cc-cover {
+  position: relative;
+  overflow: hidden;
+}
+.chapter-card.course-python .cc-cover::after {
+  content: 'PY';
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-weight: 800;
+  font-size: 22px;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: -0.04em;
+  z-index: 1;
+}
+.chapter-card.course-python .cc-num {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.02em;
+  background: rgba(255,212,59,0.95);
+  color: #0c0c0f;
+  padding: 3px 10px 3px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+.chapter-card.course-python:hover {
+  border-color: rgba(255,212,59,0.6);
+  box-shadow: 0 8px 32px rgba(55,118,171,0.25), 0 0 0 1px rgba(255,212,59,0.4);
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, rgba(55,118,171,0.08) 0%, rgba(255,212,59,0.04) 100%);
+}
+.chapter-card.course-python .cc-body h3::before {
+  content: 'def ';
+  color: #FFD43B;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  margin-right: 2px;
+}
+.chapter-card.course-python .cc-body p {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* ═══════ Python 课程：亮度提升 & 完成高亮 ═══════ */
+
+/* 卡片整体提亮 */
+.chapter-card.course-python {
+  background: linear-gradient(180deg, rgba(55,118,171,0.08) 0%, rgba(255,212,59,0.03) 60%, transparent 100%);
+  border: 1px solid rgba(55,118,171,0.25);
+}
+/* 辐射光晕更亮 */
+.chapter-card.course-python::before {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(55,118,171,0.12) 0%, transparent 40%),
+    radial-gradient(circle at 100% 100%, rgba(255,212,59,0.1) 0%, transparent 40%);
+}
+/* 封面 PY 水印更可见 */
+.chapter-card.course-python .cc-cover::after {
+  color: rgba(255,255,255,0.3);
+}
+/* 标题文字提亮 */
+.chapter-card.course-python .cc-body h3 { color: #f0f0f5; }
+.chapter-card.course-python .cc-body p { color: #b0b5c0; }
+/* 知识点数量标签 */
+.chapter-card.course-python .cc-meta span { color: #a0a5b0; }
+
+/* ═══ 已完成章节专属高亮 ═══ */
+.chapter-card.course-python .cc-meta-tag.done {
+  background: linear-gradient(135deg, rgba(255,212,59,0.2), rgba(55,118,171,0.15));
+  color: #FFD43B;
+  border: 1px solid rgba(255,212,59,0.35);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 12px rgba(255,212,59,0.15);
+}
+/* 已完成卡片 — 金色边框光环 */
+.chapter-card.course-python:has(.cc-meta-tag.done) {
+  border-color: rgba(255,212,59,0.45);
+  box-shadow: 0 4px 20px rgba(255,212,59,0.08), inset 0 1px 0 rgba(255,212,59,0.06);
+}
+/* 已完成卡片封面添加完成标识 */
+.chapter-card.course-python:has(.cc-meta-tag.done) .cc-cover::after {
+  content: '✓ DONE';
+  color: rgba(255,212,59,0.5);
+  font-size: 16px;
+}
+/* 已完成卡片 hover 不浮起 */
+.chapter-card.course-python:has(.cc-meta-tag.done):hover {
+  transform: none;
+  border-color: rgba(255,212,59,0.6);
+  box-shadow: 0 6px 28px rgba(255,212,59,0.12), inset 0 1px 0 rgba(255,212,59,0.08);
+}
+
+/* ═══════ Python 课程进度高亮（进行中 + 已完成）═══════ */
+.chapter-card.course-python .cc-meta-tag.progress {
+  background: linear-gradient(135deg, rgba(55,118,171,0.18), rgba(255,212,59,0.12));
+  color: #5eead4;
+  border: 1px solid rgba(94,234,212,0.3);
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+/* 进行中卡片：青色边框微光 */
+.chapter-card.course-python:has(.cc-meta-tag.progress) {
+  border-color: rgba(94,234,212,0.35);
+  box-shadow: 0 4px 16px rgba(94,234,212,0.06);
+}
+.chapter-card.course-python:has(.cc-meta-tag.progress) .cc-cover::after {
+  content: 'IN PROGRESS';
+  color: rgba(94,234,212,0.5);
+  font-size: 14px;
+}
