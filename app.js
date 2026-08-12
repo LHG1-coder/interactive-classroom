@@ -6204,13 +6204,13 @@ function renderChapterCard(ch) {
 
   return `
 
-    <div class="chapter-card" onclick="openChapterView(${ch.num}, '${ch.courseId || 'gaoshu'}')">
+    <div class="chapter-card course-${ch.courseId || 'gaoshu'}" onclick="openChapterView(${ch.num}, '${ch.courseId || 'gaoshu'}')">
 
-      <div class="cc-cover" style="background:linear-gradient(135deg,${color},${color}cc)">
+      <div class="cc-cover" style="${ch.courseId==='python'?'background:linear-gradient(135deg,#3776AB 0%,#3776AB 55%,#FFD43B 100%)':'background:linear-gradient(135deg,${color},${color}cc)'}">
 
         <canvas id="${canvasId}"></canvas>
 
-        <span class="cc-num">${String(ch.num).padStart(2,'0')} ${ch.title}</span>
+        <span class="cc-num">${ch.courseId==='python'?'>>> ':''}${String(ch.num).padStart(2,'0')} ${ch.title}</span>
 
         <div class="cc-progress"><div class="cc-progress-fill" style="width:${progress}%"></div></div>
 
@@ -6260,7 +6260,11 @@ function drawChapterCover(canvas, ch) {
 
 
 
-  const pad = 30;
+  
+  // Python: custom geometric patterns
+  if (ch.courseId === "python") { drawPythonCover(ctx, w, h, ch.num); return; }
+
+const pad = 30;
 
   const gw = w - 2 * pad;
 
@@ -6628,6 +6632,29 @@ function drawChapterCover(canvas, ch) {
 
 
 
+
+
+/* ====== Python section cover art ====== */
+function drawPythonCover(ctx, w, h, num) {
+  var pad = 24, cx = w/2, cy = h/2;
+  var themes = [
+    null,
+    function() { ctx.fillStyle = "rgba(55,118,171,0.2)"; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(w*0.6,0); ctx.lineTo(0,h*0.6); ctx.closePath(); ctx.fill(); ctx.fillStyle = "rgba(255,212,59,0.15)"; ctx.beginPath(); ctx.moveTo(w*0.4,h); ctx.lineTo(w,h); ctx.lineTo(w,h*0.4); ctx.closePath(); ctx.fill(); },
+    function() { ctx.strokeStyle = "rgba(255,212,59,0.2)"; ctx.lineWidth = 2; ctx.beginPath(); for (var i=0;i<=w;i+=4){ var x=i+(Math.sin(i*0.03)*20), y=cy+Math.sin(i*0.04+num)*25; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); } ctx.stroke(); },
+    function() { ctx.fillStyle = "rgba(255,255,255,0.04)"; [4,8,12,16,20,24].forEach(function(b){ctx.fillRect(pad+b*2,h*0.2,b*2,2);ctx.fillRect(pad+b*3,h*0.4,b*3,2);ctx.fillRect(pad+b*2,h*0.6,b*2,2);}); },
+    function() { ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth = 1; for (var row=0;row<5;row++) for (var col=0;col<6;col++){ var ox=pad+col*36+(row%2?18:0), oy=pad+row*28; for (var i2=0;i2<6;i2++){ var ang=i2*Math.PI/3-Math.PI/6, x2=ox+Math.cos(ang)*14, y2=oy+Math.sin(ang)*14; i2===0?(ctx.beginPath(),ctx.moveTo(x2,y2)):ctx.lineTo(x2,y2); } ctx.closePath(); ctx.stroke(); } },
+    function() { ctx.strokeStyle = "rgba(255,255,255,0.08)"; ctx.lineWidth=1.5; [0,1,2,3].forEach(function(i){var s=20+i*12;ctx.beginPath();ctx.moveTo(cx-s,cy-s/3);ctx.lineTo(cx-s,cy+s/3);ctx.stroke();ctx.beginPath();ctx.moveTo(cx+s,cy-s/3);ctx.lineTo(cx+s,cy+s/3);ctx.stroke();}); },
+    function() { ctx.strokeStyle = "rgba(255,212,59,0.15)"; ctx.lineWidth=1.5; function br(x,y,ang,len,d){if(d>3)return;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(ang)*len,y+Math.sin(ang)*len);ctx.stroke();br(x+Math.cos(ang)*len,y+Math.sin(ang)*len,ang-0.4,len*0.7,d+1);br(x+Math.cos(ang)*len,y+Math.sin(ang)*len,ang+0.4,len*0.7,d+1);} br(w/2,h,-Math.PI/2,h*0.2,0); },
+    function() { ctx.fillStyle = "rgba(55,118,171,0.15)"; var pts=[[w*0.3,h*0.3],[w*0.5,h*0.25],[w*0.7,h*0.35],[w*0.4,h*0.55],[w*0.6,h*0.5]]; pts.forEach(function(p,i){ctx.beginPath();ctx.arc(p[0],p[1],8+i*2,0,Math.PI*2);ctx.fill();}); ctx.strokeStyle = "rgba(255,255,255,0.1)"; ctx.lineWidth=1; [[0,1],[0,3],[1,2],[1,3],[2,4],[3,4]].forEach(function(a){ctx.beginPath();ctx.moveTo(pts[a[0]][0],pts[a[0]][1]);ctx.lineTo(pts[a[1]][0],pts[a[1]][1]);ctx.stroke();}); },
+    function() { ctx.strokeStyle = "rgba(255,255,255,0.06)"; ctx.lineWidth=1; for (var i=0;i<8;i++){ctx.beginPath();ctx.moveTo(pad+i*20,pad);ctx.lineTo(w-pad-i*20,h-pad);ctx.stroke();} },
+    function() { ctx.strokeStyle = "rgba(255,212,59,0.12)"; ctx.lineWidth=1; for (var i=0;i<4;i++){var s=pad+i*24;ctx.beginPath();ctx.rect(s,s,w-s*2,h-s*2);ctx.stroke();} },
+    function() { ctx.fillStyle = "rgba(55,118,171,0.12)"; ctx.fillRect(w*0.15,h*0.2,w*0.3,h*0.25); ctx.fillStyle = "rgba(255,212,59,0.1)"; ctx.fillRect(w*0.55,h*0.15,w*0.25,h*0.3); ctx.fillStyle = "rgba(255,255,255,0.06)"; ctx.fillRect(w*0.3,h*0.5,w*0.4,h*0.3); },
+  ];
+  if (themes[num]) themes[num]();
+  ctx.fillStyle = "rgba(255,212,59,0.15)"; ctx.beginPath(); ctx.moveTo(w-30,0); ctx.lineTo(w,0); ctx.lineTo(w,30); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "rgba(55,118,171,0.25)"; ctx.beginPath(); ctx.moveTo(0,h-20); ctx.lineTo(0,h); ctx.lineTo(20,h); ctx.closePath(); ctx.fill();
+}
+
 function openChapterView(num, courseId) {
 
   const cid = courseId || (state.currentCourse && state.currentCourse.id) || 'gaoshu';
@@ -6869,6 +6896,19 @@ function navigateAdjacentKP(delta) {
 
 
 function renderVizView(ch, kp) {
+    // Python course: py-viz renderer (handled by dedicated engine)
+  if (ch.courseId === "python") {
+    // pyVizMap and PyVizEngine from py-viz/py-core-viz.js handle all rendering
+    // Fallback: generic KP view with Python branding
+    var py_el = document.getElementById("viz-view");
+    var py_idx = ch.kps.indexOf(kp);
+    var py_kpD = getKPDetail(ch.courseId, ch.num, py_idx);
+    var py_expl = py_kpD && py_kpD.explanation ? py_kpD.explanation.split(String.fromCharCode(10)).join("<br>") : "暂无详细讲解。";
+    py_el.innerHTML = "<div class=view-back-bar><button class=view-back-btn onclick=backToKP()>← 返回知识点</button><span class=view-back-title>第"+ch.num+"章 "+kp.name+"</span></div>"+"<div class=viz-panel><div class=viz-header><div class=viz-icon-lg style=background:#3776AB22;color:#3776AB>PY</div><div class=viz-title-area><h2>"+kp.name+"</h2><p>"+kp.desc+"</p></div></div>"+"<div class=viz-formula><span class=hl>Python 程序设计</span></div>"+"<div class=viz-detail-content><div class=viz-detail-body>"+py_expl+"</div></div></div>";
+    return;
+  }
+
+
 
   const el = document.getElementById('viz-view');
 
@@ -10239,7 +10279,7 @@ async function clabRun() {
   out.textContent = '';
 
   try {
-    const submitRes = await fetch(JUDGE0_URL + '/submissions?base64_encoded=false&wait=false', {
+    const submitRes = await fetch(JUDGE0_URL + '/submissions?base64_encoded=true&wait=false', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -10256,7 +10296,7 @@ async function clabRun() {
     let result = null;
     for (let i = 0; i < 20; i++) {
       await new Promise(r => setTimeout(r, 800));
-      const getRes = await fetch(JUDGE0_URL + '/submissions/' + token + '?base64_encoded=false');
+      const getRes = await fetch(JUDGE0_URL + '/submissions/' + token + '?base64_encoded=true');
       result = await getRes.json();
       if (result.status && result.status.id >= 3) break;
     }
@@ -12516,21 +12556,22 @@ function updateViz3DOpacity(){
 
 }
 
+function b64dec(s){try{return s?decodeURIComponent(escape(atob(s))):s}catch(e){return s}}
 async function runInlineCode(){
 
   const editor=document.getElementById('inlineCodeEditor'),out=document.getElementById('inlineCodeOutput'),status=document.getElementById('inlineRunStatus'),btn=document.getElementById('inlineRunBtn');
 
   if(!editor||!out)return;
 
-  const code=editor.value,lang=(state.currentChapter?.courseId==='cpp')?52:50;
+  const code=editor.value,lang=(function(){var cid=state.currentChapter?.courseId;return cid==='cpp'?52:cid==='python'?71:50;})();
 
   btn.disabled=true;status.textContent='编译中...';status.style.color='#f59e0b';out.textContent='';
 
   try{
 
-    const resp=await fetch(JUDGE0_URL+'/submissions?base64_encoded=false&wait=true',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:code,language_id:lang,stdin:'',cpu_time_limit:5,memory_limit:128000})});
+    const resp=await fetch(JUDGE0_URL+'/submissions?base64_encoded=true&wait=true',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_code:btoa(unescape(encodeURIComponent(code))),language_id:lang,stdin:btoa(unescape(encodeURIComponent(''))),cpu_time_limit:5,memory_limit:128000})});
 
-    const r=await resp.json();
+    if(!resp.ok){out.style.color="#f87171";out.textContent="HTTP "+resp.status;status.textContent="请求失败";return;} const r=await resp.json(); if(r){r.stdout=b64dec(r.stdout);r.stderr=b64dec(r.stderr);r.compile_output=b64dec(r.compile_output);}
 
     if(r.stdout){out.style.color='#86efac';out.textContent=r.stdout;status.textContent='成功';status.style.color='#86efac';}
 
