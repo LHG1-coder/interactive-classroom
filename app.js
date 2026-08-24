@@ -12266,6 +12266,7 @@ renderVizView = function(ch, kp) {
           '<pre id="inlineCodeOutput" class="code-demo-output sort-code-output"></pre>'+
         '</div>'+
       '</div>'+
+      '<div id="pyChallenge" class="py-challenge"></div>'+
       '<div class="viz-tabs"><button class="viz-tab active" onclick="switchVizTab(\'detail\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="1.6"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="1.6"/></svg> 知识详解</button><button class="viz-tab" onclick="switchVizTab(\'practice\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="4" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 练习题</button></div>'+
       '<div id="viz-tab-content"><div class="viz-detail-content"><div class="viz-detail-body">'+pyDetail+'</div></div></div>'+
       '<div id="viz-tab-practice" style="display:none" class="viz-detail-content"><div class="viz-detail-body">'+pyProblems+'</div></div>'+
@@ -12278,6 +12279,7 @@ renderVizView = function(ch, kp) {
         PyVizEngine.draw();
         PyVizEngine.speed = 3;
         setTimeout(function() { PyVizEngine.play(); }, 600);
+        renderPyChallenge(algoInfo.kpId, pyCode);
       }
     }, 120);
     return;
@@ -14098,4 +14100,94 @@ function stopVizAnimation() {
 function showVizAnimHint(msg) {
   var el = document.getElementById('vizAnimationHint');
   if (el) el.textContent = msg || '点击 ▶ 自动播放 观看动画演示';
+}
+
+/* ═══════════ Python 交互挑战模块 ═══════════ */
+const PY_CHALLENGE = {
+  "py-1-2": { code: "print(2 + 3 * 4)", options: ["20", "14", "9", "报错"], answer: 1, explain: "运算符优先级：先乘除后加减。3*4=12，再 2+12=14" },
+  "py-2-0": { code: "x = 5\ny = x\nx = 10\nprint(y)", options: ["10", "5", "报错", "None"], answer: 1, explain: "y = x 时把 x 的值 5 复制给 y，之后修改 x 不影响 y" },
+  "py-2-1": { code: "print(type(3.14).__name__)", options: ["int", "float", "str", "double"], answer: 1, explain: "3.14 带小数点，是 float（浮点）类型" },
+  "py-3-0": { code: "print(3 > 2 and 5 < 4)", options: ["True", "False", "报错", "None"], answer: 1, explain: "3>2 为 True，5<4 为 False，and 需要两边都为 True，结果 False" },
+  "py-3-1": { code: "print(list(range(3)))", options: ["[0,1,2,3]", "[0,1,2]", "[1,2,3]", "报错"], answer: 1, explain: "range(3) 生成 0,1,2（不含 3），list() 转成列表" },
+  "py-4-0": { code: "nums = [1,2,3]\nnums.append(4)\nprint(len(nums))", options: ["3", "4", "报错", "None"], answer: 1, explain: "append(4) 在末尾添加元素，列表长度从 3 变为 4" },
+};
+
+let pyChallengeScore = 0;
+let pyChallengeAnswered = false;
+
+function renderPyChallenge(kpId, pyCode) {
+  const box = document.getElementById('pyChallenge');
+  if (!box) return;
+  const q = PY_CHALLENGE[kpId];
+  if (!q) { box.innerHTML = ''; return; }
+
+  pyChallengeAnswered = false;
+  box.innerHTML = '';
+
+  const card = document.createElement('div');
+  card.className = 'py-challenge-card';
+  card.style.cssText = 'margin-top:14px;padding:14px 16px;border:1px solid rgba(255,212,59,0.25);border-radius:10px;background:rgba(255,212,59,0.04);';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:#FFD43B;margin-bottom:10px;';
+  title.innerHTML = '<span>🎯</span><span>预测输出挑战</span><span style="margin-left:auto;font-size:11px;color:#94a3b8;font-weight:400">得分 <b id="pyScore">' + pyChallengeScore + '</b></span>';
+  card.appendChild(title);
+
+  const codeBlock = document.createElement('pre');
+  codeBlock.style.cssText = 'padding:10px 12px;background:#0f172a;border-radius:8px;font-family:"Fira Code",monospace;font-size:13px;color:#e2e8f0;line-height:1.6;margin-bottom:12px;white-space:pre-wrap;word-break:break-word;';
+  codeBlock.textContent = q.code;
+  card.appendChild(codeBlock);
+
+  const opts = document.createElement('div');
+  opts.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;';
+  const labels = ['A', 'B', 'C', 'D'];
+  const btns = [];
+  q.options.forEach(function(opt, i) {
+    const b = document.createElement('button');
+    b.style.cssText = 'padding:9px 12px;border:1px solid rgba(148,163,184,0.25);border-radius:8px;background:rgba(148,163,184,0.06);color:#e2e8f0;font-size:13px;cursor:pointer;text-align:left;transition:all .2s;font-family:"Fira Code",monospace;';
+    b.innerHTML = '<span style="color:#64748b;margin-right:6px">' + labels[i] + '</span>' + opt;
+    b.onmouseenter = function() { if (!pyChallengeAnswered) b.style.borderColor = 'rgba(255,212,59,0.5)'; };
+    b.onmouseleave = function() { if (!pyChallengeAnswered) b.style.borderColor = 'rgba(148,163,184,0.25)'; };
+    b.onclick = function() {
+      if (pyChallengeAnswered) return;
+      pyChallengeAnswered = true;
+      if (i === q.answer) {
+        b.style.borderColor = '#10b981';
+        b.style.background = 'rgba(16,185,129,0.15)';
+        pyChallengeScore++;
+        const sc = document.getElementById('pyScore');
+        if (sc) sc.textContent = pyChallengeScore;
+        if (window.Achievements) window.Achievements.runCode();
+      } else {
+        b.style.borderColor = '#ef4444';
+        b.style.background = 'rgba(239,68,68,0.15)';
+        btns[q.answer].style.borderColor = '#10b981';
+        btns[q.answer].style.background = 'rgba(16,185,129,0.15)';
+      }
+      showResult(i === q.answer);
+    };
+    btns.push(b);
+    opts.appendChild(b);
+  });
+  card.appendChild(opts);
+
+  const result = document.createElement('div');
+  result.style.cssText = 'margin-top:10px;min-height:20px;font-size:12px;line-height:1.5;';
+  card.appendChild(result);
+
+  function showResult(correct) {
+    if (correct) {
+      result.innerHTML = '<div style="color:#10b981;font-weight:600">✅ 回答正确！</div><div style="color:#94a3b8;margin-top:4px">' + q.explain + '</div><button id="pyVerify" style="margin-top:8px;padding:6px 12px;border:1px solid rgba(255,212,59,0.4);border-radius:6px;background:rgba(255,212,59,0.1);color:#FFD43B;font-size:12px;cursor:pointer">▶ 运行验证</button>';
+      const v = document.getElementById('pyVerify');
+      if (v) v.onclick = function() {
+        const ed = document.getElementById('inlineCodeEditor');
+        if (ed) { ed.value = q.code; }
+        if (window.runInlineCode) runInlineCode();
+      };
+    } else {
+      result.innerHTML = '<div style="color:#ef4444;font-weight:600">❌ 再想想</div><div style="color:#94a3b8;margin-top:4px">已标出正确答案（绿色），答对后可点「运行验证」亲眼确认输出</div>';
+    }
+  }
+
+  box.appendChild(card);
 }
