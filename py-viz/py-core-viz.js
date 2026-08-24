@@ -727,37 +727,6 @@ const PyVizEngine = {
 
 /* ═══════ Python 知识点到 KP-ID 的映射 ═══════ */
 
-/* ═══════════ 夜鹭吉祥物 ═══════════ */
-  var a = s / 25;
-  ctx.globalAlpha = 0.35;
-  // Body — simple round oval
-  ctx.fillStyle = '#64748b';
-  ctx.beginPath();
-  ctx.ellipse(x, y + 3*a, 8*a, 7*a, 0, 0, Math.PI*2);
-  ctx.fill();
-  // Head — small circle
-  ctx.fillStyle = '#334155';
-  ctx.beginPath();
-  ctx.arc(x - 4*a, y - 6*a, 5*a, 0, Math.PI*2);
-  ctx.fill();
-  // Eyes — two tiny dots
-  ctx.fillStyle = '#f87171';
-  ctx.beginPath(); ctx.arc(x - 5.5*a, y - 7*a, 1.2*a, 0, Math.PI*2); ctx.fill();
-  // Beak
-  ctx.strokeStyle = '#fbbf24';
-  ctx.lineWidth = 1.3*a;
-  ctx.beginPath();
-  ctx.moveTo(x - 8*a, y - 7*a);
-  ctx.lineTo(x - 13*a, y - 6*a);
-  ctx.stroke();
-  // Legs — two simple lines
-  ctx.strokeStyle = '#fbbf24';
-  ctx.lineWidth = 1.2*a;
-  ctx.beginPath(); ctx.moveTo(x - 1*a, y + 10*a); ctx.lineTo(x - 1*a, y + 20*a); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(x + 3*a, y + 10*a); ctx.lineTo(x + 3*a, y + 20*a); ctx.stroke();
-  ctx.globalAlpha = 1;
-}
-
 const pyVizMap = {
   'Python 简介与应用领域': { kpId:'py-1-0', name:'Python语言概述' },
   '开发环境配置':         { kpId:'py-1-1', name:'开发环境配置演示' },
