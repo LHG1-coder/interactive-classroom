@@ -17,6 +17,28 @@ const PyVizEngine = {
     this.dpr = window.devicePixelRatio || 1;
     this._resize(); this.stepIdx = 0; this.playing = false;
     if (this.animId) { cancelAnimationFrame(this.animId); this.animId = null; }
+    this._bindInteractions();
+  },
+
+  /* ── 交互：点击画布 + 键盘快捷键 ── */
+  _bindInteractions() {
+    // 点击画布：暂停时推进下一步，播放时暂停
+    this.canvas.style.cursor = 'pointer';
+    this.canvas.onclick = () => {
+      if (this.playing) { this.pause(); }
+      else if (this.stepIdx < this.steps.length - 1) { this.next(); }
+    };
+    // 键盘：←→ 切换步骤，空格播放/暂停（只绑一次）
+    if (!this._keysBound) {
+      this._keysBound = true;
+      document.addEventListener('keydown', (e) => {
+        const box = document.getElementById('pyVizCanvas');
+        if (!box) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); this.next(); }
+        else if (e.key === 'ArrowLeft') { e.preventDefault(); this.prev(); }
+        else if (e.key === ' ') { e.preventDefault(); if (this.playing) this.pause(); else this.play(); }
+      });
+    }
   },
 
   _resize() {
@@ -89,6 +111,12 @@ const PyVizEngine = {
 
     const fn = this['_draw_' + step.type];
     if (fn) fn.call(this, ctx, W, H, step);
+    // 右下角交互提示
+    ctx.fillStyle = 'rgba(148,163,184,0.35)';
+    ctx.font = '10px "Microsoft YaHei", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText('点击画布推进 · ←→ 切换 · 空格播放', W - 10, H - 10);
+    ctx.textAlign = 'start';
   },
 
   /* ═══════════════ 绘制函数 ═══════════════ */

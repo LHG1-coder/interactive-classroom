@@ -12267,6 +12267,7 @@ renderVizView = function(ch, kp) {
         '</div>'+
       '</div>'+
       '<div id="pyChallenge" class="py-challenge"></div>'+
+      '<div id="pyCards" class="py-cards"></div>'+
       '<div class="viz-tabs"><button class="viz-tab active" onclick="switchVizTab(\'detail\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="1.6"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="1.6"/></svg> 知识详解</button><button class="viz-tab" onclick="switchVizTab(\'practice\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="4" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 练习题</button></div>'+
       '<div id="viz-tab-content"><div class="viz-detail-content"><div class="viz-detail-body">'+pyDetail+'</div></div></div>'+
       '<div id="viz-tab-practice" style="display:none" class="viz-detail-content"><div class="viz-detail-body">'+pyProblems+'</div></div>'+
@@ -12280,6 +12281,7 @@ renderVizView = function(ch, kp) {
         PyVizEngine.speed = 3;
         setTimeout(function() { PyVizEngine.play(); }, 600);
         renderPyChallenge(algoInfo.kpId, pyCode);
+        renderPyCards();
       }
     }, 120);
     return;
@@ -14190,4 +14192,66 @@ function renderPyChallenge(kpId, pyCode) {
   }
 
   box.appendChild(card);
+}
+
+/* ═══════════ Python 概念翻牌卡 ═══════════ */
+const PY_CONCEPTS = [
+  { front: "list", tag: "可变序列", back: "方括号 [ ] 定义，支持增删改查，最常用的容器" },
+  { front: "tuple", tag: "不可变序列", back: "圆括号 ( ) 定义，创建后不能修改，可作字典键" },
+  { front: "dict", tag: "键值对映射", back: "花括号 { } 定义，键不可变，查找 O(1)" },
+  { front: "set", tag: "无序去重", back: "元素不重复，支持交并差运算，成员检测 O(1)" },
+  { front: "def", tag: "定义函数", back: "def func(): 定义函数，return 返回结果" },
+  { front: "lambda", tag: "匿名函数", back: "lambda x: x*2，单表达式函数，用于 map/filter" },
+  { front: "range", tag: "整数序列", back: "range(3) 生成 0,1,2，左闭右开，不含终点" },
+  { front: "import", tag: "导入模块", back: "import math 导入标准库或第三方模块" },
+];
+
+function renderPyCards() {
+  const box = document.getElementById('pyCards');
+  if (!box) return;
+  box.innerHTML = '';
+
+  // 标题
+  const head = document.createElement('div');
+  head.style.cssText = 'margin-top:14px;font-weight:700;font-size:14px;color:#3776AB;margin-bottom:10px;';
+  head.innerHTML = '<span>🐍</span> 概念速记卡 <span style="font-weight:400;font-size:11px;color:#94a3b8">（点击卡片翻面）</span>';
+  box.appendChild(head);
+
+  // 卡片网格
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(4,1fr);gap:10px;';
+  if (window.innerWidth < 640) grid.style.gridTemplateColumns = 'repeat(2,1fr)';
+
+  PY_CONCEPTS.forEach(function(concept) {
+    const card = document.createElement('div');
+    card.className = 'py-flip-card';
+    card.style.cssText = 'height:90px;cursor:pointer;perspective:800px;';
+
+    const inner = document.createElement('div');
+    inner.style.cssText = 'position:relative;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d;';
+
+    // 正面
+    const front = document.createElement('div');
+    front.style.cssText = 'position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid rgba(55,118,171,0.35);border-radius:10px;background:rgba(55,118,171,0.08);';
+    front.innerHTML = '<div style="font-family:\'Fira Code\',monospace;font-size:18px;font-weight:700;color:#60a5fa">' + concept.front + '</div><div style="font-size:10px;color:#64748b;margin-top:4px">点击翻面</div>';
+
+    // 反面
+    const back = document.createElement('div');
+    back.style.cssText = 'position:absolute;inset:0;backface-visibility:hidden;transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;box-sizing:border-box;border:1px solid rgba(255,212,59,0.35);border-radius:10px;background:rgba(255,212,59,0.06);text-align:center;';
+    back.innerHTML = '<div style="font-size:12px;font-weight:700;color:#FFD43B;margin-bottom:4px">' + concept.tag + '</div><div style="font-size:10px;color:#cbd5e1;line-height:1.4">' + concept.back + '</div>';
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+
+    card.onclick = function() {
+      const flipped = card.classList.contains('flipped');
+      if (flipped) { card.classList.remove('flipped'); inner.style.transform = 'rotateY(0deg)'; }
+      else { card.classList.add('flipped'); inner.style.transform = 'rotateY(180deg)'; }
+    };
+
+    grid.appendChild(card);
+  });
+
+  box.appendChild(grid);
 }
