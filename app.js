@@ -364,265 +364,265 @@ const chaptersData = [
 
   /* ═══ C 语言章节 ═══ */
 
-  { courseId:'clang', num:1, title:'C 语言概述与环境', vol:'基础', progress:0, level:'入门',
+  { courseId:'clang', num:1, title:'C 语言概述与环境', vol:'基础', progress:0, level:'入门', kw:'INTRO',
 
     kps:[
 
-      {name:'C 语言历史与应用', desc:'C 语言发展历程、应用领域与特点', viz:'code-demo'},
+      {name:'C 语言历史与应用', desc:'C 语言发展历程、应用领域与特点', viz:'ccpp-viz'},
 
-      {name:'开发环境配置', desc:'编译器安装、IDE 使用、第一个 Hello World', viz:'code-demo'},
+      {name:'开发环境配置', desc:'编译器安装、IDE 使用、第一个 Hello World', viz:'ccpp-viz'},
 
-      {name:'程序结构', desc:'main 函数、预处理指令、注释规范', viz:'code-demo'},
+      {name:'程序结构', desc:'main 函数、预处理指令、注释规范', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:2, title:'数据类型与变量', vol:'基础', progress:0, level:'基础',
+  { courseId:'clang', num:2, title:'数据类型与变量', vol:'基础', progress:0, level:'基础', kw:'TYPE',
 
     kps:[
 
-      {name:'基本数据类型', desc:'int、float、double、char 的范围与用法', viz:'code-demo'},
+      {name:'基本数据类型', desc:'int、float、double、char 的范围与用法', viz:'ccpp-viz'},
 
-      {name:'变量与常量', desc:'变量声明、初始化、const 常量、#define 宏', viz:'code-demo'},
+      {name:'变量与常量', desc:'变量声明、初始化、const 常量、#define 宏', viz:'ccpp-viz'},
 
-      {name:'类型转换', desc:'隐式转换、强制类型转换、sizeof 运算符', viz:'code-demo'},
+      {name:'类型转换', desc:'隐式转换、强制类型转换、sizeof 运算符', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:3, title:'运算符与表达式', vol:'基础', progress:0, level:'基础',
+  { courseId:'clang', num:3, title:'运算符与表达式', vol:'基础', progress:0, level:'基础', kw:'OPERATOR',
 
     kps:[
 
-      {name:'算术与关系运算符', desc:'加减乘除取模、比较运算符与优先级', viz:'code-demo'},
+      {name:'算术与关系运算符', desc:'加减乘除取模、比较运算符与优先级', viz:'ccpp-viz'},
 
-      {name:'逻辑与位运算符', desc:'&&、||、!，按位与或非移位', viz:'code-demo'},
+      {name:'逻辑与位运算符', desc:'&&、||、!，按位与或非移位', viz:'ccpp-viz'},
 
-      {name:'赋值与条件运算符', desc:'复合赋值、三目运算符 ?:', viz:'code-demo'},
+      {name:'赋值与条件运算符', desc:'复合赋值、三目运算符 ?:', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:4, title:'控制流程', vol:'基础', progress:0, level:'基础',
+  { courseId:'clang', num:4, title:'控制流程', vol:'基础', progress:0, level:'基础', kw:'FLOW',
 
     kps:[
 
-      {name:'条件语句', desc:'if-else、switch-case 的语法与使用', viz:'code-demo'},
+      {name:'条件语句', desc:'if-else、switch-case 的语法与使用', viz:'ccpp-viz'},
 
-      {name:'循环语句', desc:'for、while、do-while 的区别与应用', viz:'code-demo'},
+      {name:'循环语句', desc:'for、while、do-while 的区别与应用', viz:'ccpp-viz'},
 
-      {name:'跳转语句', desc:'break、continue、goto 的使用场景', viz:'code-demo'},
+      {name:'跳转语句', desc:'break、continue、goto 的使用场景', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:5, title:'函数', vol:'核心', progress:0, level:'核心',
+  { courseId:'clang', num:5, title:'函数', vol:'核心', progress:0, level:'核心', kw:'FUNCTION',
 
     kps:[
 
-      {name:'函数定义与调用', desc:'函数原型、参数传递（值传递）、返回值', viz:'code-demo'},
+      {name:'函数定义与调用', desc:'函数原型、参数传递（值传递）、返回值', viz:'ccpp-viz'},
 
-      {name:'递归函数', desc:'递归思想、递归条件、经典递归问题', viz:'code-demo'},
+      {name:'递归函数', desc:'递归思想、递归条件、经典递归问题', viz:'ccpp-viz'},
 
-      {name:'变量作用域', desc:'局部变量、全局变量、static 静态变量', viz:'code-demo'},
+      {name:'变量作用域', desc:'局部变量、全局变量、static 静态变量', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:6, title:'数组与字符串', vol:'核心', progress:0, level:'核心',
+  { courseId:'clang', num:6, title:'数组与字符串', vol:'核心', progress:0, level:'核心', kw:'ARRAY',
 
     kps:[
 
-      {name:'一维与二维数组', desc:'数组声明、初始化、遍历与操作', viz:'code-demo'},
+      {name:'一维与二维数组', desc:'数组声明、初始化、遍历与操作', viz:'ccpp-viz'},
 
-      {name:'字符数组与字符串', desc:'字符串的存储、常用库函数 strlen/strcpy/strcmp', viz:'code-demo'},
+      {name:'字符数组与字符串', desc:'字符串的存储、常用库函数 strlen/strcpy/strcmp', viz:'ccpp-viz'},
 
-      {name:'数组与函数', desc:'数组作为函数参数、返回数组', viz:'code-demo'},
+      {name:'数组与函数', desc:'数组作为函数参数、返回数组', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:7, title:'指针', vol:'核心', progress:0, level:'重点',
+  { courseId:'clang', num:7, title:'指针', vol:'核心', progress:0, level:'重点', kw:'POINTER',
 
     kps:[
 
-      {name:'指针基础', desc:'指针的定义、取址运算 & 与解引用 *', viz:'code-demo'},
+      {name:'指针基础', desc:'指针的定义、取址运算 & 与解引用 *', viz:'ccpp-viz'},
 
-      {name:'指针与数组', desc:'指针算术、数组名即指针、指针遍历数组', viz:'code-demo'},
+      {name:'指针与数组', desc:'指针算术、数组名即指针、指针遍历数组', viz:'ccpp-viz'},
 
-      {name:'指针与函数', desc:'指针传参（地址传递）、函数指针', viz:'code-demo'},
+      {name:'指针与函数', desc:'指针传参（地址传递）、函数指针', viz:'ccpp-viz'},
 
-      {name:'多级指针', desc:'二级指针、指针数组与数组指针', viz:'code-demo'},
+      {name:'多级指针', desc:'二级指针、指针数组与数组指针', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:8, title:'结构体与联合体', vol:'核心', progress:0, level:'重点',
+  { courseId:'clang', num:8, title:'结构体与联合体', vol:'核心', progress:0, level:'重点', kw:'STRUCT',
 
     kps:[
 
-      {name:'结构体', desc:'struct 定义、成员访问、结构体数组', viz:'code-demo'},
+      {name:'结构体', desc:'struct 定义、成员访问、结构体数组', viz:'ccpp-viz'},
 
-      {name:'联合体与枚举', desc:'union 共享内存特性、enum 枚举类型', viz:'code-demo'},
+      {name:'联合体与枚举', desc:'union 共享内存特性、enum 枚举类型', viz:'ccpp-viz'},
 
-      {name:'链表基础', desc:'动态分配节点、单链表的创建与遍历', viz:'code-demo'},
+      {name:'链表基础', desc:'动态分配节点、单链表的创建与遍历', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:9, title:'文件操作', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'clang', num:9, title:'文件操作', vol:'进阶', progress:0, level:'进阶', kw:'FILE',
 
     kps:[
 
-      {name:'文件的打开与关闭', desc:'fopen/fclose、文件模式 r/w/a', viz:'code-demo'},
+      {name:'文件的打开与关闭', desc:'fopen/fclose、文件模式 r/w/a', viz:'ccpp-viz'},
 
-      {name:'文件的读写', desc:'fgetc/fputc、fgets/fputs、fscanf/fprintf', viz:'code-demo'},
+      {name:'文件的读写', desc:'fgetc/fputc、fgets/fputs、fscanf/fprintf', viz:'ccpp-viz'},
 
-      {name:'二进制文件', desc:'fread/fwrite、文件定位 fseek/ftell', viz:'code-demo'},
+      {name:'二进制文件', desc:'fread/fwrite、文件定位 fseek/ftell', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'clang', num:10, title:'动态内存与预处理', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'clang', num:10, title:'动态内存与预处理', vol:'进阶', progress:0, level:'进阶', kw:'MEMORY',
 
     kps:[
 
-      {name:'动态内存管理', desc:'malloc/calloc/realloc/free 的用法与内存泄漏', viz:'code-demo'},
+      {name:'动态内存管理', desc:'malloc/calloc/realloc/free 的用法与内存泄漏', viz:'ccpp-viz'},
 
-      {name:'预处理器', desc:'宏定义、条件编译、头文件包含与防重复', viz:'code-demo'},
+      {name:'预处理器', desc:'宏定义、条件编译、头文件包含与防重复', viz:'ccpp-viz'},
 
-      {name:'常见编程错误', desc:'越界、野指针、内存泄漏的调试技巧', viz:'code-demo'},
+      {name:'常见编程错误', desc:'越界、野指针、内存泄漏的调试技巧', viz:'ccpp-viz'},
 
     ]},
 
   /* ═══ C++ 章节 ═══ */
 
-  { courseId:'cpp', num:1, title:'C++ 基础与 C 扩展', vol:'基础', progress:0, level:'入门',
+  { courseId:'cpp', num:1, title:'C++ 基础与 C 扩展', vol:'基础', progress:0, level:'入门', kw:'BASICS',
 
     kps:[
 
-      {name:'C++ 与 C 的区别', desc:'命名空间、cin/cout、bool 类型、内联函数', viz:'code-demo'},
+      {name:'C++ 与 C 的区别', desc:'命名空间、cin/cout、bool 类型、内联函数', viz:'ccpp-viz'},
 
-      {name:'引用', desc:'引用的定义与使用、引用传参、常量引用', viz:'code-demo'},
+      {name:'引用', desc:'引用的定义与使用、引用传参、常量引用', viz:'ccpp-viz'},
 
-      {name:'函数重载与默认参数', desc:'重载规则、默认参数值、重载解析', viz:'code-demo'},
+      {name:'函数重载与默认参数', desc:'重载规则、默认参数值、重载解析', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:2, title:'类与对象', vol:'基础', progress:0, level:'核心',
+  { courseId:'cpp', num:2, title:'类与对象', vol:'基础', progress:0, level:'核心', kw:'CLASS',
 
     kps:[
 
-      {name:'类的定义', desc:'class 关键字、成员变量与成员函数、访问控制', viz:'code-demo'},
+      {name:'类的定义', desc:'class 关键字、成员变量与成员函数、访问控制', viz:'ccpp-viz'},
 
-      {name:'构造与析构函数', desc:'构造函数重载、拷贝构造、析构函数', viz:'code-demo'},
+      {name:'构造与析构函数', desc:'构造函数重载、拷贝构造、析构函数', viz:'ccpp-viz'},
 
-      {name:'this 指针', desc:'this 指针的含义与使用场景', viz:'code-demo'},
+      {name:'this 指针', desc:'this 指针的含义与使用场景', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:3, title:'运算符重载', vol:'基础', progress:0, level:'核心',
+  { courseId:'cpp', num:3, title:'运算符重载', vol:'基础', progress:0, level:'核心', kw:'OVERLOAD',
 
     kps:[
 
-      {name:'运算符重载基础', desc:'operator 关键字、成员函数与友元函数重载', viz:'code-demo'},
+      {name:'运算符重载基础', desc:'operator 关键字、成员函数与友元函数重载', viz:'ccpp-viz'},
 
-      {name:'常见运算符重载', desc:'+、-、==、<<、>> 的重载实现', viz:'code-demo'},
+      {name:'常见运算符重载', desc:'+、-、==、<<、>> 的重载实现', viz:'ccpp-viz'},
 
-      {name:'赋值运算符与深拷贝', desc:'operator= 与深拷贝、移动语义简介', viz:'code-demo'},
+      {name:'赋值运算符与深拷贝', desc:'operator= 与深拷贝、移动语义简介', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:4, title:'继承', vol:'核心', progress:0, level:'核心',
+  { courseId:'cpp', num:4, title:'继承', vol:'核心', progress:0, level:'核心', kw:'INHERIT',
 
     kps:[
 
-      {name:'继承基础', desc:'public/protected/private 继承方式', viz:'code-demo'},
+      {name:'继承基础', desc:'public/protected/private 继承方式', viz:'ccpp-viz'},
 
-      {name:'派生类', desc:'基类与派生类关系、构造顺序、override', viz:'code-demo'},
+      {name:'派生类', desc:'基类与派生类关系、构造顺序、override', viz:'ccpp-viz'},
 
-      {name:'多重继承', desc:'多重继承语法、菱形继承问题与虚基类', viz:'code-demo'},
+      {name:'多重继承', desc:'多重继承语法、菱形继承问题与虚基类', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:5, title:'多态与虚函数', vol:'核心', progress:0, level:'重点',
+  { courseId:'cpp', num:5, title:'多态与虚函数', vol:'核心', progress:0, level:'重点', kw:'VIRTUAL',
 
     kps:[
 
-      {name:'虚函数', desc:'virtual 关键字、虚函数表、动态绑定', viz:'code-demo'},
+      {name:'虚函数', desc:'virtual 关键字、虚函数表、动态绑定', viz:'ccpp-viz'},
 
-      {name:'纯虚函数与抽象类', desc:'= 0 纯虚函数、抽象类不可实例化', viz:'code-demo'},
+      {name:'纯虚函数与抽象类', desc:'= 0 纯虚函数、抽象类不可实例化', viz:'ccpp-viz'},
 
-      {name:'虚析构函数', desc:'基类指针删除派生类对象时的正确析构', viz:'code-demo'},
+      {name:'虚析构函数', desc:'基类指针删除派生类对象时的正确析构', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:6, title:'模板', vol:'核心', progress:0, level:'重点',
+  { courseId:'cpp', num:6, title:'模板', vol:'核心', progress:0, level:'重点', kw:'TEMPLATE',
 
     kps:[
 
-      {name:'函数模板', desc:'template<typename T> 函数模板语法与实例化', viz:'code-demo'},
+      {name:'函数模板', desc:'template<typename T> 函数模板语法与实例化', viz:'ccpp-viz'},
 
-      {name:'类模板', desc:'模板类的定义、成员函数模板、偏特化', viz:'code-demo'},
+      {name:'类模板', desc:'模板类的定义、成员函数模板、偏特化', viz:'ccpp-viz'},
 
-      {name:'模板元编程简介', desc:'编译期计算、enable_if 简介', viz:'code-demo'},
+      {name:'模板元编程简介', desc:'编译期计算、enable_if 简介', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:7, title:'STL 标准库', vol:'进阶', progress:0, level:'重点',
+  { courseId:'cpp', num:7, title:'STL 标准库', vol:'进阶', progress:0, level:'重点', kw:'STL',
 
     kps:[
 
-      {name:'容器', desc:'vector、list、map、set 的用法与选型', viz:'code-demo'},
+      {name:'容器', desc:'vector、list、map、set 的用法与选型', viz:'ccpp-viz'},
 
-      {name:'迭代器', desc:'迭代器分类、begin/end、范围 for 循环', viz:'code-demo'},
+      {name:'迭代器', desc:'迭代器分类、begin/end、范围 for 循环', viz:'ccpp-viz'},
 
-      {name:'算法', desc:'sort、find、transform、accumulate 常用算法', viz:'code-demo'},
+      {name:'算法', desc:'sort、find、transform、accumulate 常用算法', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:8, title:'异常处理', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'cpp', num:8, title:'异常处理', vol:'进阶', progress:0, level:'进阶', kw:'EXCEPT',
 
     kps:[
 
-      {name:'try-catch-throw', desc:'异常的抛出、捕获与重新抛出', viz:'code-demo'},
+      {name:'try-catch-throw', desc:'异常的抛出、捕获与重新抛出', viz:'ccpp-viz'},
 
-      {name:'标准异常类', desc:'std::exception 体系、自定义异常', viz:'code-demo'},
+      {name:'标准异常类', desc:'std::exception 体系、自定义异常', viz:'ccpp-viz'},
 
-      {name:'RAII 资源管理', desc:'构造获取资源、析构释放资源、智能指针简介', viz:'code-demo'},
+      {name:'RAII 资源管理', desc:'构造获取资源、析构释放资源、智能指针简介', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:9, title:'智能指针与现代 C++', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'cpp', num:9, title:'智能指针与现代 C++', vol:'进阶', progress:0, level:'进阶', kw:'SMART',
 
     kps:[
 
-      {name:'unique_ptr 与 shared_ptr', desc:'独占与共享所有权、make_unique/make_shared', viz:'code-demo'},
+      {name:'unique_ptr 与 shared_ptr', desc:'独占与共享所有权、make_unique/make_shared', viz:'ccpp-viz'},
 
-      {name:'移动语义与右值引用', desc:'std::move、移动构造函数、完美转发', viz:'code-demo'},
+      {name:'移动语义与右值引用', desc:'std::move、移动构造函数、完美转发', viz:'ccpp-viz'},
 
-      {name:'Lambda 表达式', desc:'捕获列表、参数类型推断、与 STL 配合', viz:'code-demo'},
+      {name:'Lambda 表达式', desc:'捕获列表、参数类型推断、与 STL 配合', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:10, title:'文件与字符串流', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'cpp', num:10, title:'文件与字符串流', vol:'进阶', progress:0, level:'进阶', kw:'STREAM',
 
     kps:[
 
-      {name:'文件流', desc:'ifstream/ofstream/fstream 的使用', viz:'code-demo'},
+      {name:'文件流', desc:'ifstream/ofstream/fstream 的使用', viz:'ccpp-viz'},
 
-      {name:'字符串流', desc:'stringstream 的解析与格式化应用', viz:'code-demo'},
+      {name:'字符串流', desc:'stringstream 的解析与格式化应用', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:11, title:'并发编程简介', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'cpp', num:11, title:'并发编程简介', vol:'进阶', progress:0, level:'进阶', kw:'THREAD',
 
     kps:[
 
-      {name:'std::thread', desc:'线程创建、join/detach、线程参数传递', viz:'code-demo'},
+      {name:'std::thread', desc:'线程创建、join/detach、线程参数传递', viz:'ccpp-viz'},
 
-      {name:'互斥与条件变量', desc:'mutex、lock_guard、condition_variable', viz:'code-demo'},
+      {name:'互斥与条件变量', desc:'mutex、lock_guard、condition_variable', viz:'ccpp-viz'},
 
     ]},
 
-  { courseId:'cpp', num:12, title:'设计模式与最佳实践', vol:'进阶', progress:0, level:'进阶',
+  { courseId:'cpp', num:12, title:'设计模式与最佳实践', vol:'进阶', progress:0, level:'进阶', kw:'PATTERN',
 
     kps:[
 
-      {name:'常用设计模式', desc:'单例、工厂、观察者模式的 C++ 实现', viz:'code-demo'},
+      {name:'常用设计模式', desc:'单例、工厂、观察者模式的 C++ 实现', viz:'ccpp-viz'},
 
-      {name:'代码规范与调试', desc:'命名规范、const 正确性、Valgrind 内存检测', viz:'code-demo'},
+      {name:'代码规范与调试', desc:'命名规范、const 正确性、Valgrind 内存检测', viz:'ccpp-viz'},
 
     ]},
 
@@ -5919,15 +5919,34 @@ function showCourseSelectView() {
 
     <div class="course-select-grid">
 
-      ${coursesData.map(c => `
+      ${coursesData.map(c => {
 
-        <div class="course-select-card ${c.available ? '' : 'locked-card'}" onclick="${c.available ? `openCourse('${c.id}')` : ''}">
+        const isClang = c.id === 'clang';
+        const isCpp = c.id === 'cpp';
+        const isPremium = isClang || isCpp;
+        const watermark = isClang ? 'C' : (isCpp ? 'C++' : c.name.substring(0,2));
+        const premiumClass = isPremium ? `premium-course-card course-${c.id}` : '';
+        const bottomText = isClang ? 'C LANGUAGE · 在线编译' : (isCpp ? 'C++ PROGRAMMING · OOP' : '');
 
-          <div class="csc-cover" style="background:${c.gradient}">
+        return `
+
+        <div class="course-select-card ${premiumClass} ${c.available ? '' : 'locked-card'}" onclick="${c.available ? `openCourse('${c.id}')` : ''}">
+
+          <div class="csc-cover" style="${isPremium ? '' : 'background:' + c.gradient}">
+
+            <span class="csc-watermark">${watermark}</span>
 
             <span class="csc-cover-text">${c.name.substring(0,2)}</span>
 
             <span class="csc-badge">${c.badge}</span>
+
+            ${isPremium ? `
+            <div class="csc-logo">
+              <span class="csc-logo1">${watermark}</span>
+              <span class="csc-logo2">${isClang ? 'POINTER' : 'CLASS'}</span>
+              <span class="csc-trail"></span>
+            </div>
+            <div class="csc-logo-bottom-text">${c.name}</div>` : ''}
 
           </div>
 
@@ -5947,9 +5966,11 @@ function showCourseSelectView() {
 
           </div>
 
-        </div>
+          ${isPremium ? `<div class="csc-bottom-text">${bottomText}</div>` : ''}
 
-      `).join('')}
+        </div>`;
+
+      }).join('')}
 
     </div>`;
 
@@ -6130,7 +6151,7 @@ function renderChaptersView() {
 
       <span class="view-back-title">${state.currentCourse.name}${versionStr}</span>
 
-      ${(cid === 'clang' || cid === 'cpp') ? `<button class="btn btn-primary" style="margin-left:auto;font-size:0.82rem;padding:0.5rem 1rem" onclick="navigate('lab');setTimeout(()=>openCodingLab(),100)">🧠 打开内存练习</button>` : ''}
+      ${(cid === 'clang' || cid === 'cpp') ? `<button class="btn btn-primary" style="margin-left:auto;font-size:0.82rem;padding:0.5rem 1rem" onclick="openCodingLab({courseId:'${cid}'})">🧠 打开内存练习</button>` : ''}
 
     </div>
 
@@ -6202,15 +6223,34 @@ function renderChapterCard(ch) {
 
       : '<span class="cc-meta-tag locked">未开始</span>';
 
+  const isClang = ch.courseId === 'clang';
+  const isCpp = ch.courseId === 'cpp';
+  const isPremium = isClang || isCpp;
+  const premiumClass = isPremium ? `premium-chapter-card course-${ch.courseId}` : '';
+  const coverStyle = isPremium
+    ? ''
+    : (ch.courseId==='python'?'background:linear-gradient(135deg,#3776AB 0%,#3776AB 55%,#FFD43B 100%)':'background:linear-gradient(135deg,${color},${color}cc)');
+  const chNum = String(ch.num).padStart(2, '0');
+
   return `
 
-    <div class="chapter-card course-${ch.courseId || 'gaoshu'}" onclick="openChapterView(${ch.num}, '${ch.courseId || 'gaoshu'}')">
+    <div class="chapter-card ${premiumClass} course-${ch.courseId || 'gaoshu'}" onclick="openChapterView(${ch.num}, '${ch.courseId || 'gaoshu'}')">
 
-      <div class="cc-cover" style="${ch.courseId==='python'?'background:linear-gradient(135deg,#3776AB 0%,#3776AB 55%,#FFD43B 100%)':'background:linear-gradient(135deg,${color},${color}cc)'}">
+      <div class="cc-cover" style="${coverStyle}">
+
+        ${isPremium ? `<span class="cc-watermark">${chNum}</span>` : ''}
 
         <canvas id="${canvasId}"></canvas>
 
-        <span class="cc-num">${ch.courseId==='python'?'>>> ':''}${String(ch.num).padStart(2,'0')} ${ch.title}</span>
+        ${isPremium ? `
+        <div class="cc-logo">
+          <span class="cc-logo1">${chNum}</span>
+          <span class="cc-logo2">${ch.kw || (isClang ? 'POINTER' : 'CLASS')}</span>
+          <span class="cc-trail"></span>
+        </div>
+        <div class="cc-logo-bottom-text">${ch.title}</div>` : ''}
+
+        <span class="cc-num">${ch.courseId==='python'?'>>> ':''}${chNum} ${ch.title}</span>
 
         <div class="cc-progress"><div class="cc-progress-fill" style="width:${progress}%"></div></div>
 
@@ -7159,7 +7199,13 @@ function renderVizView(ch, kp) {
 
                   <label>${p.label} <span id="viz-val-${p.id}">${p.default}</span></label>
 
-                  <input type="range" id="viz-param-${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.default}" oninput="updateViz()">
+                  <div class="viz-param-row">
+
+                    <input type="range" id="viz-param-${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.default}" oninput="syncVizParam('${p.id}','range')">
+
+                    <input type="number" id="viz-num-${p.id}" min="${p.min}" max="${p.max}" step="${p.step}" value="${p.default}" oninput="syncVizParam('${p.id}','num')">
+
+                  </div>
 
                 </div>
 
@@ -7491,6 +7537,55 @@ function updateViz() {
   });
 
   viz.render(params);
+
+}
+
+// C2：滑块/输入框双控 —— 同步两个输入控件并即时重绘
+function setVizParamUI(id, val) {
+
+  const range = document.getElementById('viz-param-' + id);
+
+  const num = document.getElementById('viz-num-' + id);
+
+  const valSpan = document.getElementById('viz-val-' + id);
+
+  if (range) range.value = val;
+
+  if (num) num.value = val;
+
+  if (valSpan) valSpan.textContent = Number.isInteger(val) ? val : Number(val).toFixed(2);
+
+}
+
+function syncVizParam(id, source) {
+
+  const range = document.getElementById('viz-param-' + id);
+
+  const num = document.getElementById('viz-num-' + id);
+
+  if (!range) return;
+
+  if (source === 'num') {
+
+    let v = parseFloat(num.value);
+
+    const min = parseFloat(range.min), max = parseFloat(range.max);
+
+    if (isNaN(v)) return;
+
+    if (v < min) v = min;
+
+    if (v > max) v = max;
+
+    range.value = v;
+
+  } else if (num) {
+
+    num.value = range.value;
+
+  }
+
+  updateViz();
 
 }
 
@@ -8305,7 +8400,21 @@ updateGreeting();
 /* ─── 初始化 ─── */
 
 updateFavBadge();
-navigate('dashboard');
+
+// 深链接: ?course=clang / ?course=cpp 直达对应课程章节页
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const cid = params.get('course');
+  if (cid) {
+    const course = coursesData.find(c => c.id === cid && c.available);
+    if (course) {
+      navigate('courses');
+      openCourse(cid);
+      return;
+    }
+  }
+  navigate('dashboard');
+})();
 
 
 
@@ -10184,18 +10293,44 @@ function _refreshHighlight() {
   if (pre) pre.scrollTop = ta.scrollTop;
 }
 
-function openCodingLab() {
+function openCodingLab(opts) {
+  opts = opts || {};
+  const overlay = document.getElementById('clab-float-overlay');
   const panel = document.getElementById('coding-lab-panel');
-  if (!panel) return;
-  panel.style.display = 'block';
-  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const win = document.getElementById('clab-float-window');
+  if (!overlay || !panel) return;
 
-  if (!_codingLab) {
-    _codingLab = new CodingLabEngine();
-    const codeArea = document.getElementById('clabCodeArea');
-    const memoryView = document.getElementById('clabMemoryView');
-    _codingLab.init(codeArea, memoryView);
+  // 打开悬浮窗时，主页自动回到题库，方便边读题边写代码
+  if (opts.courseId && opts.chNum) {
+    navigate('questions');
+    setTimeout(() => renderQBChapterDetail(opts.courseId, opts.chNum), 80);
+  } else if (opts.courseId) {
+    navigate('questions');
+    setTimeout(() => renderQBChapters(opts.courseId), 80);
+  } else {
+    navigate('questions');
   }
+
+  // 重置窗口位置与默认尺寸（居中偏上，不遮挡题库）
+  if (win) {
+    win.style.width = '';
+    win.style.height = '';
+    win.style.left = '50%';
+    win.style.top = '60px';
+    win.style.transform = 'translateX(-50%)';
+  }
+
+  overlay.style.display = 'block';
+  // 不再锁定 body 滚动，方便在悬浮窗外用题库/翻页
+  panel.style.display = 'flex';
+  panel.style.flexDirection = 'column';
+  panel.style.marginTop = '0';
+
+  // 初始化/重新挂载引擎到当前 DOM
+  const codeArea = document.getElementById('clabCodeArea');
+  const memoryView = document.getElementById('clabMemoryView');
+  if (!_codingLab) _codingLab = new CodingLabEngine();
+  _codingLab.init(codeArea, memoryView);
 
   const ta = document.getElementById('clabCodeArea');
   // 自动配对括号: () {} [] "" ''
@@ -10318,13 +10453,16 @@ function openCodingLab() {
       if (typeof _clabAutoSave === 'function') _clabAutoSave();
     });
 
-    // 滚动同步
-    ta.addEventListener('scroll', function() {
-      const pre = document.getElementById('clabHighlight');
-      if (pre) pre.scrollTop = this.scrollTop;
-      if (typeof _highlightClabLine === 'function') _highlightClabLine();
-    });
-  }
+  // 滚动同步
+  ta.addEventListener('scroll', function() {
+    const pre = document.getElementById('clabHighlight');
+    if (pre) pre.scrollTop = this.scrollTop;
+    if (typeof _highlightClabLine === 'function') _highlightClabLine();
+  });
+}
+
+  _setupClabDrag();
+  _setupClabResize();
 
   _codingLab.reset();
   _updateClabStepInfo();
@@ -10344,9 +10482,100 @@ function closeCodingLab() {
     }
     globalMemoryArrows.clear();
   }
+  const overlay = document.getElementById('clab-float-overlay');
   const panel = document.getElementById('coding-lab-panel');
+  if (overlay) overlay.style.display = 'none';
   if (panel) panel.style.display = 'none';
+  document.body.style.overflow = '';
 }
+
+let _clabDragState = null;
+function _setupClabDrag() {
+  const title = document.getElementById('clab-float-titlebar');
+  if (!title || title._clabDragSet) return;
+  title._clabDragSet = true;
+  title.addEventListener('mousedown', function(e) {
+    if (e.target.closest('button')) return; // 让关闭按钮可点
+    const win = document.getElementById('clab-float-window');
+    if (!win) return;
+    const rect = win.getBoundingClientRect();
+    _clabDragState = { win: win, startX: e.clientX, startY: e.clientY, left: rect.left, top: rect.top };
+    win.style.left = rect.left + 'px';
+    win.style.top = rect.top + 'px';
+    win.style.transform = 'none';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+}
+
+(function() {
+  document.addEventListener('mousemove', function(e) {
+    if (!_clabDragState) return;
+    const win = _clabDragState.win;
+    let nx = _clabDragState.left + e.clientX - _clabDragState.startX;
+    let ny = _clabDragState.top + e.clientY - _clabDragState.startY;
+    const pad = 4;
+    const maxX = window.innerWidth - win.offsetWidth - pad;
+    const maxY = window.innerHeight - win.offsetHeight - pad;
+    nx = Math.max(pad, Math.min(maxX, nx));
+    ny = Math.max(pad, Math.min(maxY, ny));
+    win.style.left = nx + 'px';
+    win.style.top = ny + 'px';
+  });
+  document.addEventListener('mouseup', function() {
+    _clabDragState = null;
+    document.body.style.userSelect = '';
+  });
+})();
+
+let _clabResizeState = null;
+function _setupClabResize() {
+  const handle = document.getElementById('clab-resize-handle');
+  if (!handle || handle._clabResizeSet) return;
+  handle._clabResizeSet = true;
+  handle.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const win = document.getElementById('clab-float-window');
+    if (!win) return;
+    const rect = win.getBoundingClientRect();
+    _clabResizeState = {
+      win: win,
+      startX: e.clientX,
+      startY: e.clientY,
+      width: rect.width,
+      height: rect.height,
+      left: rect.left,
+      top: rect.top
+    };
+    document.body.style.userSelect = 'none';
+  });
+}
+
+(function() {
+  document.addEventListener('mousemove', function(e) {
+    if (!_clabResizeState) return;
+    const st = _clabResizeState;
+    const win = st.win;
+    let newW = st.width + (e.clientX - st.startX);
+    let newH = st.height + (e.clientY - st.startY);
+    const pad = 8;
+    const minW = 480;
+    const minH = 340;
+    const maxW = window.innerWidth - st.left - pad;
+    const maxH = window.innerHeight - st.top - pad;
+    newW = Math.max(minW, Math.min(maxW, newW));
+    newH = Math.max(minH, Math.min(maxH, newH));
+    win.style.width = newW + 'px';
+    win.style.height = newH + 'px';
+  });
+  document.addEventListener('mouseup', function() {
+    if (!_clabResizeState) return;
+    _clabResizeState = null;
+    document.body.style.userSelect = '';
+  });
+})();
 
 // ═══════ ▶ 运行：双引擎（可视化 + 真实编译）═══════
 async function clabRun() {
@@ -12287,6 +12516,63 @@ renderVizView = function(ch, kp) {
     return;
   }
 
+  // ccpp-viz: C/C++ 课程逐步动画可视化（仿 Python 课程风格）
+  if (kp.viz === 'ccpp-viz') {
+    const el = document.getElementById('viz-view');
+    const isCpp = (ch.courseId === 'cpp');
+    const langColor = isCpp ? '#8b5cf6' : '#0ea5e9';
+    const algoInfo = ccppVizMap[kp.name] || { kpId: (isCpp ? 'cpp-intro' : 'c-intro'), name: (isCpp ? 'C++ 概念演示' : 'C 语言概念演示') };
+    const csKey = ch.courseId + '-' + ch.num + '-' + ch.kps.indexOf(kp);
+    const cs = codeSamples[csKey];
+    const fallbackCode = isCpp
+      ? '#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello C++!" << endl;\n    return 0;\n}'
+      : '#include <stdio.h>\n\nint main() {\n    printf("Hello C!\\n");\n    return 0;\n}';
+    const ccppCode = cs ? cs.code : fallbackCode;
+    const ccppDetail = (function(){ const d=getKPDetail(ch.courseId,ch.num,ch.kps.indexOf(kp)); return d?d.explanation.replace(/\n/g,'<br>'):'暂无详细讲解。'; })();
+    const ccppProblems = (function(){ const d=getKPDetail(ch.courseId,ch.num,ch.kps.indexOf(kp)); if(!d||!d.problems) return '<p>暂无练习题</p>'; return d.problems.map(function(p,i){ return '<div class="practice-item"><div class="practice-q"><span class="q-num">Q'+(i+1)+'</span>'+p.q+'</div><div class="practice-a" style="display:none"><strong>答：</strong>'+p.a+'</div><button class="practice-toggle" onclick="var p=this.previousElementSibling;p.style.display=p.style.display===\'none\'?\'block\':\'none\';this.textContent=p.style.display===\'none\'?\'查看答案\':\'收起答案\'">查看答案</button></div>'; }).join(''); })();
+    el.innerHTML =
+      '<div class="view-back-bar"><button class="view-back-btn" onclick="backToKP()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>返回知识点</button><span class="view-back-title">第'+ch.num+'章 · '+kp.name+'</span></div>'+
+      '<div class="viz-panel">'+
+      '<div class="viz-header"><div class="viz-icon-lg" style="background:'+langColor+'22;color:'+langColor+'">'+(isCpp?'C++':'C')+'</div><div class="viz-title-area"><h2>'+kp.name+'</h2><p>'+kp.desc+'</p></div></div>'+
+      '<div class="sort-dual-wrap">'+
+        '<div class="sort-anim-col">'+
+          '<div class="sort-anim-header"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="5 3 19 12 5 21" fill="currentColor"/></svg> '+algoInfo.name+'演示</div>'+
+          '<canvas id="ccppVizCanvas" style="display:block;width:100%;border-radius:10px;background:#0f172a"></canvas>'+
+          '<div class="sort-progress-wrap"><div class="sort-progress-bar"><div class="sort-progress-fill" id="ccppProgressFill"></div></div></div>'+
+          '<div class="sort-step-info" id="ccppStepInfo">准备中...</div>'+
+          '<div class="sort-controls" id="ccppControls">'+
+            '<button class="sort-btn sort-btn-reset" onclick="CCppVizEngine.reset()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="2"/><path d="M3.51 15a9 9 0 1 0 .49-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>'+
+            '<button class="sort-btn sort-btn-prev" onclick="CCppVizEngine.prev()">◀</button>'+
+            '<button class="sort-btn sort-btn-play" id="ccppPlayBtn" onclick="if(CCppVizEngine.playing)CCppVizEngine.pause();else CCppVizEngine.play()">▶ 播放</button>'+
+            '<button class="sort-btn sort-btn-next" onclick="CCppVizEngine.next()">▶</button>'+
+            '<div class="sort-speed-wrap"><label style="font-size:11px;color:#94a3b8">速度 <span id="ccppSpeedVal">3</span></label>'+
+            '<input type="range" id="ccppSpeedRange" min="1" max="10" value="3" step="1" style="width:70px;accent-color:'+langColor+'" oninput="CCppVizEngine.speed=+this.value;document.getElementById(\'ccppSpeedVal\').textContent=this.value"></div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="sort-code-col">'+
+          '<div class="sort-code-header"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M16 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> '+(isCpp?'C++':'C')+' 代码</div>'+
+          '<textarea id="inlineCodeEditor" class="code-demo-editor sort-code-editor" spellcheck="false">'+ccppCode+'</textarea>'+
+          '<div class="code-demo-actions"><button id="inlineRunBtn" class="code-demo-run" onclick="runInlineCode()"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> 运行代码</button><span id="inlineRunStatus" class="code-demo-status"></span></div>'+
+          '<pre id="inlineCodeOutput" class="code-demo-output sort-code-output"></pre>'+
+        '</div>'+
+      '</div>'+
+      '<div class="viz-tabs"><button class="viz-tab active" onclick="switchVizTab(\'detail\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke="currentColor" stroke-width="1.6"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke="currentColor" stroke-width="1.6"/></svg> 知识详解</button><button class="viz-tab" onclick="switchVizTab(\'practice\',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="3" width="6" height="4" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M9 14l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg> 练习题</button></div>'+
+      '<div id="viz-tab-content"><div class="viz-detail-content"><div class="viz-detail-body">'+ccppDetail+'</div></div></div>'+
+      '<div id="viz-tab-practice" style="display:none" class="viz-detail-content"><div class="viz-detail-body">'+ccppProblems+'</div></div>'+
+      '</div>';
+    setTimeout(function() {
+      const canvas = document.getElementById('ccppVizCanvas');
+      if (canvas) {
+        CCppVizEngine.init(canvas);
+        CCppVizEngine.generateSteps(algoInfo.kpId, algoInfo);
+        CCppVizEngine.draw();
+        CCppVizEngine.speed = 3;
+        setTimeout(function() { CCppVizEngine.play(); }, 600);
+      }
+    }, 120);
+    return;
+  }
+
 if (kp.viz === 'code-demo') {
 
     const el = document.getElementById('viz-view');
@@ -14047,12 +14333,7 @@ function toggleVizAnimation() {
   } else {
     viz.animate(function(p) {
       viz.params.forEach(function(param) {
-        var slider = document.getElementById('viz-param-' + param.id);
-        var valSpan = document.getElementById('viz-val-' + param.id);
-        if (slider && p[param.id] !== undefined) {
-          slider.value = p[param.id];
-          valSpan.textContent = Number.isInteger(p[param.id]) ? p[param.id] : p[param.id].toFixed(2);
-        }
+        if (p[param.id] !== undefined) setVizParamUI(param.id, p[param.id]);
       });
       viz.render(p);
     }, showVizAnimHint);
@@ -14075,10 +14356,7 @@ function startGenericVizAnimation(viz) {
       var amp = (param.max - param.min) * 0.4;
       var val = mid + amp * Math.sin(elapsed * 1.2 + idx * 0.7);
       p[param.id] = Number(val.toFixed(3));
-      var slider = document.getElementById('viz-param-' + param.id);
-      var valSpan = document.getElementById('viz-val-' + param.id);
-      if (slider) slider.value = p[param.id];
-      if (valSpan) valSpan.textContent = Number.isInteger(p[param.id]) ? p[param.id] : p[param.id].toFixed(2);
+      setVizParamUI(param.id, p[param.id]);
     });
     viz.render(p);
     showVizAnimHint(msgs[Math.floor(elapsed / 2) % msgs.length]);

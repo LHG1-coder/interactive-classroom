@@ -829,9 +829,263 @@ const CCppVizEngine = {
       { type:'code', lines:['// 头文件防重复包含','#ifndef STUDENT_H','#define STUDENT_H','','struct Student {','    int id;','};','','#endif // STUDENT_H'], highlightLine:0, note:'#ifndef/#define/#endif 防止重复包含', info:'头文件保护' },
     ];
   },
+
+  _gen_c_intro() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'C 语言历史与应用', sub:'1972 贝尔实验室 · Dennis Ritchie', color:'#0ea5e9', info:'C 语言历史' },
+      { type:'code', lines:['// 第一个 C 程序','#include <stdio.h>','','int main() {','    printf("Hello, World!\\n");','    return 0;','}'], highlightLine:0, note:'main 函数是程序入口, 程序从这里开始执行', info:'Hello World' },
+      { type:'flow', nodes:[
+        {x:W*0.5, y:H*0.16, label:'C 语言', color:'#0ea5e9'},
+        {x:W*0.24, y:H*0.5, label:'嵌入式', color:'#0ea5e9'},
+        {x:W*0.76, y:H*0.5, label:'游戏引擎', color:'#0ea5e9'},
+        {x:W*0.24, y:H*0.84, label:'系统编程', color:'#0ea5e9'},
+        {x:W*0.76, y:H*0.84, label:'编译器/内核', color:'#0ea5e9'},
+      ], edges:[[0,1],[0,2],[1,3],[2,4]], highlight:0, note:'C 语言应用领域极其广泛', info:'应用领域' },
+      { type:'compare', left:{title:'C 语言优势', color:'#0ea5e9'}, right:{title:'学习要点', color:'#f59e0b'}, items:[
+        {left:'高效 · 接近硬件', right:'指针与内存'},
+        {left:'可移植性强', right:'函数与结构体'},
+        {left:'语法简洁', right:'文件与预处理'},
+        {left:'生态庞大', right:'算法思维'},
+      ], note:'C 是系统级语言的基础', info:'语言特点' },
+    ];
+  },
+
+  _gen_c_structure() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'程序结构', sub:'预处理指令 · main 函数 · 注释规范', color:'#0ea5e9', info:'程序结构' },
+      { type:'code', lines:['// 预处理指令(头文件)','#include <stdio.h>','','// 函数定义','int add(int a, int b) {','    return a + b;','}','','// 主函数: 程序入口','int main() {','    printf("%d\\n", add(3, 5));  // 输出 8','    return 0;','}'], highlightLine:8, note:'程序 = 预处理指令 + 函数 + main 入口', info:'程序骨架' },
+      { type:'flow', nodes:[
+        {x:W*0.2, y:H*0.25, label:'源代码 .c', color:'#0ea5e9'},
+        {x:W*0.5, y:H*0.25, label:'预处理', color:'#f59e0b'},
+        {x:W*0.8, y:H*0.25, label:'编译', color:'#8b5cf6'},
+        {x:W*0.5, y:H*0.6, label:'链接', color:'#34d399'},
+        {x:W*0.2, y:H*0.6, label:'可执行文件', color:'#f59e0b'},
+      ], edges:[[0,1],[1,2],[2,3],[3,4]], highlight:1, note:'编译四阶段: 预处理→编译→汇编→链接', info:'编译流程' },
+      { type:'code', lines:['// 注释规范','/* 这是块注释','   可以跨多行 */','','// 这是单行注释','','// 命名建议: 见名知意','int student_count = 30;  // 清晰','int sc = 30;             // 不推荐'], highlightLine:0, note:'良好的注释提高代码可读性', info:'注释规范' },
+    ];
+  },
+
+  _gen_c_type_cast() {
+    this.steps = [
+      { type:'title', t:'类型转换', sub:'隐式转换 · 强制转换 · sizeof', color:'#0ea5e9', info:'类型转换' },
+      { type:'code', lines:['// 隐式转换(自动)','int a = 10;','double b = a;      // int → double','','char c = \'A\';','int d = c;          // char → int (ASCII 65)','','// 整数提升','short s = 100;','int e = s + 200;    // s 提升为 int'], highlightLine:0, note:'隐式转换: 低精度自动转为高精度', info:'隐式转换' },
+      { type:'code', lines:['// 强制类型转换','double pi = 3.14159;','int x = (int)pi;    // 截断为 3','','// 可能的精度丢失','int big = 300;','char small = (char)big;  // 溢出! 只取低 8 位','','// sizeof 运算符','printf("%zu", sizeof(int));    // 4','printf("%zu", sizeof(double)); // 8'], highlightLine:2, note:'强制转换: (类型)表达式, 可能丢失数据', info:'强制转换' },
+      { type:'compare', left:{title:'隐式转换', color:'#0ea5e9'}, right:{title:'强制转换', color:'#f59e0b'}, items:[
+        {left:'自动发生', right:'手动指定'},
+        {left:'低→高精度', right:'任意类型'},
+        {left:'无精度丢失', right:'可能溢出/截断'},
+        {left:'int→double', right:'(int)3.14 = 3'},
+      ], note:'隐式安全但有限, 强制灵活但需谨慎', info:'对比' },
+    ];
+  },
+
+  _gen_c_assign_cond() {
+    this.steps = [
+      { type:'title', t:'赋值与条件运算符', sub:'复合赋值 · 三目运算符 ?:', color:'#0ea5e9', info:'赋值与条件运算符' },
+      { type:'code', lines:['// 复合赋值运算符','int a = 10;','a += 5;   // a = a + 5 → 15','a -= 3;   // a = a - 3 → 12','a *= 2;   // a = a * 2 → 24','a /= 4;   // a = a / 4 → 6','a %= 4;   // a = a % 4 → 2','','// 自增自减','int i = 0;','i++;  // i = 1','++i;  // i = 2'], highlightLine:0, note:'复合赋值: 先运算再赋值, 写法更简洁', info:'复合赋值' },
+      { type:'code', lines:['// 三目运算符','// 表达式 ? 值1 : 值2','int score = 85;','char grade = (score >= 60) ? \'P\' : \'F\';','','// 等价于','char grade2;','if (score >= 60) grade2 = \'P\';','else grade2 = \'F\';','','// 求最大值','int max = (a > b) ? a : b;'], highlightLine:2, note:'?: 是 if-else 的简洁形式, 返回一个值', info:'三目运算符' },
+      { type:'compare', left:{title:'if-else', color:'#0ea5e9'}, right:{title:'三目 ?:', color:'#f59e0b'}, items:[
+        {left:'语句, 不返回值', right:'表达式, 返回一个值'},
+        {left:'可含多语句', right:'仅一个值'},
+        {left:'可读性好', right:'简洁紧凑'},
+        {left:'适合复杂逻辑', right:'适合简单判断'},
+      ], note:'简单赋值用 ?:, 复杂逻辑用 if-else', info:'对比' },
+    ];
+  },
+
+  _gen_c_multi_ptr() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'多级指针', sub:'二级指针 · 指针数组 · 数组指针', color:'#0ea5e9', info:'多级指针' },
+      { type:'code', lines:['// 二级指针: 指向指针的指针','int x = 10;','int *p = &x;    // 一级指针, 存 x 的地址','int **pp = &p;  // 二级指针, 存 p 的地址','','// 解引用','*p == 10;    // 一级解引用得 x','**pp == 10;  // 二级解引用得 x','*pp == p;    // 得一级指针 p'], highlightLine:3, note:'二级指针 pp → 一级指针 p → 变量 x', info:'二级指针' },
+      { type:'flow', nodes:[
+        {x:W*0.7, y:H*0.5, label:'x = 10', color:'#34d399'},
+        {x:W*0.4, y:H*0.5, label:'p = &x', color:'#0ea5e9'},
+        {x:W*0.1, y:H*0.5, label:'pp = &p', color:'#f59e0b'},
+      ], edges:[[2,1],[1,0]], highlight:2, note:'pp → p → x 的指针链', info:'指针链' },
+      { type:'code', lines:['// 指针数组 vs 数组指针','int *pa[5];   // 指针数组: 5个指针','int (*ap)[5]; // 数组指针: 指向含5元素的数组','','// 指针数组用途: 字符串数组','char *names[] = {"Tom", "Jerry", "Bob"};','','// 二级指针作函数参数(修改一级指针)','void change(int **pp) {','    static int y = 100;','    *pp = &y;  // 修改外部指针指向','}'], highlightLine:0, note:'指针数组是数组, 数组指针是指针', info:'区分' },
+    ];
+  },
+
+  _gen_cpp_intro() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'C++ 与 C 的区别', sub:'命名空间 · cin/cout · bool · 内联函数', color:'#8b5cf6', info:'C++ 与 C 区别' },
+      { type:'code', lines:['// C++ 输入输出(对比 C 的 printf/scanf)','#include <iostream>','using namespace std;','','int main() {','    int age;','    cout << "请输入年龄: ";   // 输出','    cin >> age;               // 输入','    cout << "你 " << age << " 岁" << endl;','    return 0;','}'], highlightLine:6, note:'cout 输出, cin 输入, 无需格式符', info:'cin/cout' },
+      { type:'flow', nodes:[
+        {x:W*0.3, y:H*0.3, label:'C++ 特性', color:'#8b5cf6'},
+        {x:W*0.75, y:H*0.2, label:'命名空间', color:'#8b5cf6'},
+        {x:W*0.75, y:H*0.45, label:'面向对象', color:'#8b5cf6'},
+        {x:W*0.75, y:H*0.7, label:'模板/STL', color:'#8b5cf6'},
+        {x:W*0.75, y:H*0.85, label:'bool/引用', color:'#8b5cf6'},
+      ], edges:[[0,1],[0,2],[0,3],[0,4]], highlight:0, note:'C++ 是 C 的超集, 兼容 C 代码', info:'C++ 特性' },
+      { type:'compare', left:{title:'C', color:'#0ea5e9'}, right:{title:'C++', color:'#8b5cf6'}, items:[
+        {left:'过程式编程', right:'面向对象'},
+        {left:'printf/scanf', right:'cin/cout'},
+        {left:'无命名空间', right:'namespace'},
+        {left:'无模板', right:'模板/STL'},
+        {left:'无 bool(用int)', right:'bool 类型'},
+      ], note:'C++ 保留 C 全部特性并扩展新特性', info:'C vs C++' },
+    ];
+  },
+
+  _gen_cpp_this() {
+    this.steps = [
+      { type:'title', t:'this 指针', sub:'this 指针的含义与使用场景', color:'#8b5cf6', info:'this 指针' },
+      { type:'code', lines:['class Point {','    int x, y;','public:','    // 参数名与成员名冲突时用 this 区分','    void set(int x, int y) {','        this->x = x;   // this->x 是成员','        this->y = y;','    }','    // 链式调用: 返回自身引用','    Point& move(int dx) {','        x += dx;','        return *this;  // 返回对象自身','    }','};'], highlightLine:5, note:'this 是指向当前对象的指针', info:'this 指针' },
+      { type:'code', lines:['// 链式调用示例','Point p;','p.set(3, 4).move(1).move(2);','// 等价于:','// p.set(3,4) 返回 p 本身','// 再 p.move(1) 又返回 p','// 再 p.move(2)','','// this 的本质','// 成员函数实际是:','// void set(Point* this, int x, int y)'], highlightLine:1, note:'return *this 实现链式调用', info:'链式调用' },
+      { type:'compare', left:{title:'this 用途', color:'#8b5cf6'}, right:{title:'说明', color:'#f59e0b'}, items:[
+        {left:'区分成员/参数', right:'this->x = x'},
+        {left:'返回自身', right:'return *this'},
+        {left:'访问成员', right:'this->member'},
+        {left:'每个成员函数隐含', right:'编译器自动传入'},
+      ], note:'this 只在成员函数内部有效', info:'this 总结' },
+    ];
+  },
+
+  _gen_cpp_op_overload() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'运算符重载', sub:'operator 关键字 · 成员/友元重载', color:'#8b5cf6', info:'运算符重载' },
+      { type:'code', lines:['class Complex {','    double r, i;','public:','    Complex(double r=0, double i=0):r(r),i(i){}','','    // 成员函数重载 +','    Complex operator+(const Complex &c) {','        return Complex(r + c.r, i + c.i);','    }','    // 友元函数重载 <<','    friend ostream& operator<<(ostream &os, const Complex &c) {','        os << c.r << "+" << c.i << "i";','        return os;','    }','};'], highlightLine:6, note:'operator+ 让对象也能用 + 运算', info:'operator+' },
+      { type:'code', lines:['// 使用重载运算符','Complex a(1, 2), b(3, 4);','Complex c = a + b;     // 调用 operator+','cout << c;             // 调用 operator<<','// 输出: 4+6i','','// 可重载: + - * / == < << >> ++ -- [ ]','// 不可重载: .  ::  sizeof  ?:  .*'], highlightLine:2, note:'重载让自定义类型像内置类型一样运算', info:'使用重载' },
+      { type:'flow', nodes:[
+        {x:W*0.3, y:H*0.35, label:'a + b', color:'#8b5cf6'},
+        {x:W*0.7, y:H*0.35, label:'a.operator+(b)', color:'#0ea5e9'},
+        {x:W*0.5, y:H*0.7, label:'返回 Complex', color:'#34d399'},
+      ], edges:[[0,1],[1,2]], highlight:1, note:'a + b 被编译器改写为 a.operator+(b)', info:'调用过程' },
+    ];
+  },
+
+  _gen_cpp_file_stream() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'文件与字符串流', sub:'ifstream · ofstream · stringstream', color:'#8b5cf6', info:'文件与字符串流' },
+      { type:'code', lines:['#include <fstream>','using namespace std;','','int main() {','    // 写文件','    ofstream out("data.txt");','    out << "Hello C++!" << endl;','    out.close();','','    // 读文件','    ifstream in("data.txt");','    string line;','    getline(in, line);','    cout << line;  // Hello C++!','}'], highlightLine:5, note:'ofstream 写, ifstream 读, fstream 读写', info:'文件流' },
+      { type:'flow', nodes:[
+        {x:W*0.2, y:H*0.3, label:'ofstream', color:'#8b5cf6'},
+        {x:W*0.2, y:H*0.7, label:'ifstream', color:'#0ea5e9'},
+        {x:W*0.7, y:H*0.5, label:'data.txt', color:'#34d399'},
+      ], edges:[[0,2],[2,1]], highlight:2, note:'文件流在内存与磁盘之间传递数据', info:'读写流程' },
+      { type:'code', lines:['#include <sstream>','// 字符串流: 在内存中读写字符串','','// 格式化(拼接)','stringstream ss;','ss << "年龄: " << 20 << ", 分数: " << 95.5;','string s = ss.str();  // "年龄: 20, 分数: 95.5"','','// 解析(拆分)','stringstream ss2("10 20 30");','int a, b, c;','ss2 >> a >> b >> c;   // a=10 b=20 c=30'], highlightLine:4, note:'stringstream 可格式化也可解析字符串', info:'字符串流' },
+    ];
+  },
+
+  _gen_cpp_thread() {
+    const W = this.W, H = this.H;
+    this.steps = [
+      { type:'title', t:'并发编程', sub:'std::thread · mutex · 条件变量', color:'#8b5cf6', info:'并发编程' },
+      { type:'code', lines:['#include <thread>','using namespace std;','','void task(int id) {','    printf("线程 %d 运行\\n", id);','}','','int main() {','    thread t1(task, 1);  // 创建线程','    thread t2(task, 2);','','    t1.join();  // 等待线程结束','    t2.join();','    return 0;','}'], highlightLine:8, note:'thread 创建线程, join 等待其结束', info:'std::thread' },
+      { type:'flow', nodes:[
+        {x:W*0.5, y:H*0.15, label:'main 线程', color:'#0ea5e9'},
+        {x:W*0.22, y:H*0.55, label:'t1 线程', color:'#8b5cf6'},
+        {x:W*0.78, y:H*0.55, label:'t2 线程', color:'#8b5cf6'},
+        {x:W*0.5, y:H*0.85, label:'join 汇合', color:'#34d399'},
+      ], edges:[[0,1],[0,2],[1,3],[2,3]], highlight:1, note:'多线程并发执行, join 等待汇合', info:'线程并发' },
+      { type:'code', lines:['#include <mutex>','// 互斥锁: 保护共享资源','int counter = 0;','mutex mtx;','','void add() {','    lock_guard<mutex> lock(mtx);  // 自动加锁/解锁','    counter++;                    // 临界区','}  // 离开作用域自动解锁','','// condition_variable: 线程间同步','condition_variable cv;','// cv.wait(lock, pred) / cv.notify_one()'], highlightLine:6, note:'lock_guard 自动管理锁的生命周期', info:'互斥锁' },
+    ];
+  },
+
+  _gen_cpp_design_pattern() {
+    this.steps = [
+      { type:'title', t:'常用设计模式', sub:'单例 · 工厂 · 观察者', color:'#8b5cf6', info:'设计模式' },
+      { type:'code', lines:['// 单例模式: 类只有一个实例','class Singleton {','private:','    Singleton() {}   // 构造私有, 禁止外部 new','    static Singleton *inst;','public:','    static Singleton* getInstance() {','        if (!inst) inst = new Singleton();','        return inst;','    }','};','Singleton* Singleton::inst = nullptr;','','// 使用: Singleton::getInstance() 全程序唯一'], highlightLine:4, note:'构造私有 + 静态实例 = 单例', info:'单例模式' },
+      { type:'code', lines:['// 工厂模式: 统一创建对象','class Animal { public: virtual void speak()=0; };','class Dog : public Animal {','public: void speak(){ cout << "汪"; }','};','class Cat : public Animal {','public: void speak(){ cout << "喵"; }','};','','Animal* create(const string &type) {','    if (type == "dog") return new Dog();','    if (type == "cat") return new Cat();','    return nullptr;','}'], highlightLine:10, note:'工厂把对象的创建集中管理', info:'工厂模式' },
+      { type:'compare', left:{title:'模式', color:'#8b5cf6'}, right:{title:'解决什么问题', color:'#f59e0b'}, items:[
+        {left:'单例', right:'全局唯一实例'},
+        {left:'工厂', right:'解耦创建逻辑'},
+        {left:'观察者', right:'一对多通知'},
+        {left:'策略', right:'算法可替换'},
+      ], note:'设计模式是可复用的解决方案', info:'模式一览' },
+    ];
+  },
+
+  _gen_cpp_best_practice() {
+    this.steps = [
+      { type:'title', t:'代码规范与调试', sub:'命名规范 · const 正确性 · 内存检测', color:'#8b5cf6', info:'代码规范与调试' },
+      { type:'code', lines:['// 命名规范','class StudentInfo {      // 类: 大驼峰','public:','    int getAge() const;   // 函数: 小驼峰','private:','    int age_;            // 成员: 下划线后缀','};','','const int MAX_SIZE = 100;  // 常量: 全大写','int student_count = 0;     // 变量: 下划线'], highlightLine:0, note:'一致的命名规范提高可读性', info:'命名规范' },
+      { type:'code', lines:['// const 正确性','// 不修改成员的函数声明为 const','int getAge() const { return age_; }','','// const 引用传参: 避免拷贝且不修改','void print(const StudentInfo &s) {','    cout << s.getAge();','}','','// const 指针: 指向内容不可改','const int *p = &x;   // *p 只读','int *const q = &x;   // q 只读'], highlightLine:2, note:'const 让编译器帮我们捕捉错误', info:'const 正确性' },
+      { type:'code', lines:['// 内存检测 (Valgrind)','// 编译时加 -g 保留调试信息','// $ valgrind --leak-check=full ./program','','// 常见内存问题:','// 1. 内存泄漏: new 后未 delete','// 2. 野指针: 释放后未置空','// 3. 越界: 访问数组范围外','// 4. 重复释放: delete 两次','','// 防御: 释放后置空','delete p;','p = nullptr;'], highlightLine:0, note:'Valgrind 检测内存泄漏与非法访问', info:'内存检测' },
+    ];
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// 知识点名 → 可视化 kpId 映射表 (与 app.js chaptersData 的 kp.name 对齐)
+// ─────────────────────────────────────────────────────────────
+const ccppVizMap = {
+  // C 语言 (31 KP)
+  'C 语言历史与应用':   { kpId:'c-intro',        name:'C语言历史与应用' },
+  '开发环境配置':       { kpId:'c-intro',        name:'开发环境配置' },
+  '程序结构':           { kpId:'c-structure',    name:'程序结构' },
+  '基本数据类型':       { kpId:'c-data-types',   name:'基本数据类型' },
+  '变量与常量':         { kpId:'c-variables',    name:'变量与常量' },
+  '类型转换':           { kpId:'c-type-cast',    name:'类型转换' },
+  '算术与关系运算符':   { kpId:'c-operators',    name:'算术与关系运算符' },
+  '逻辑与位运算符':     { kpId:'c-operators',    name:'逻辑与位运算符' },
+  '赋值与条件运算符':   { kpId:'c-assign-cond',  name:'赋值与条件运算符' },
+  '条件语句':           { kpId:'c-control-flow', name:'条件分支' },
+  '循环语句':           { kpId:'c-control-flow', name:'循环控制' },
+  '跳转语句':           { kpId:'c-control-flow', name:'跳转语句' },
+  '函数定义与调用':     { kpId:'c-functions',    name:'函数定义与调用' },
+  '递归函数':           { kpId:'c-recursion',    name:'递归调用' },
+  '变量作用域':         { kpId:'c-scope',        name:'变量作用域' },
+  '一维与二维数组':     { kpId:'c-arrays',       name:'一维与二维数组' },
+  '字符数组与字符串':   { kpId:'c-strings',      name:'字符数组与字符串' },
+  '数组与函数':         { kpId:'c-arrays',       name:'数组与函数' },
+  '指针基础':           { kpId:'c-pointers',     name:'指针基础' },
+  '指针与数组':         { kpId:'c-ptr-array',    name:'指针与数组' },
+  '指针与函数':         { kpId:'c-pointers',     name:'指针与函数' },
+  '多级指针':           { kpId:'c-multi-ptr',    name:'多级指针' },
+  '结构体':             { kpId:'c-structs',      name:'结构体' },
+  '联合体与枚举':       { kpId:'c-structs',      name:'联合体与枚举' },
+  '链表基础':           { kpId:'c-linked-list',  name:'链表基础' },
+  '文件的打开与关闭':   { kpId:'c-file-io',      name:'文件打开与关闭' },
+  '文件的读写':         { kpId:'c-file-io',      name:'文件读写' },
+  '二进制文件':         { kpId:'c-file-io',      name:'二进制文件' },
+  '动态内存管理':       { kpId:'c-memory',       name:'动态内存管理' },
+  '预处理器':           { kpId:'c-preprocessor', name:'预处理器' },
+  '常见编程错误':       { kpId:'c-memory',       name:'常见编程错误' },
+
+  // C++ (33 KP)
+  'C++ 与 C 的区别':    { kpId:'cpp-intro',          name:'C++ 与 C 的区别' },
+  '引用':               { kpId:'cpp-reference',      name:'引用' },
+  '函数重载与默认参数': { kpId:'cpp-overload',       name:'函数重载与默认参数' },
+  '类的定义':           { kpId:'cpp-class',          name:'类的定义' },
+  '构造与析构函数':     { kpId:'cpp-constructor',    name:'构造与析构函数' },
+  'this 指针':          { kpId:'cpp-this',           name:'this 指针' },
+  '运算符重载基础':     { kpId:'cpp-op-overload',    name:'运算符重载基础' },
+  '常见运算符重载':     { kpId:'cpp-op-overload',    name:'常见运算符重载' },
+  '赋值运算符与深拷贝': { kpId:'cpp-op-overload',    name:'赋值运算符与深拷贝' },
+  '继承基础':           { kpId:'cpp-inheritance',    name:'继承基础' },
+  '派生类':             { kpId:'cpp-inheritance',    name:'派生类' },
+  '多重继承':           { kpId:'cpp-inheritance',    name:'多重继承' },
+  '虚函数':             { kpId:'cpp-polymorphism',   name:'虚函数与动态绑定' },
+  '纯虚函数与抽象类':   { kpId:'cpp-polymorphism',   name:'纯虚函数与抽象类' },
+  '虚析构函数':         { kpId:'cpp-polymorphism',   name:'虚析构函数' },
+  '函数模板':           { kpId:'cpp-template',       name:'函数模板' },
+  '类模板':             { kpId:'cpp-template',       name:'类模板' },
+  '模板元编程简介':     { kpId:'cpp-template',       name:'模板元编程' },
+  '容器':               { kpId:'cpp-stl',            name:'STL 容器' },
+  '迭代器':             { kpId:'cpp-stl',            name:'STL 迭代器' },
+  '算法':               { kpId:'cpp-stl',            name:'STL 算法' },
+  'try-catch-throw':    { kpId:'cpp-exception',      name:'异常抛出与捕获' },
+  '标准异常类':         { kpId:'cpp-exception',      name:'标准异常类' },
+  'RAII 资源管理':      { kpId:'cpp-exception',      name:'RAII 资源管理' },
+  'unique_ptr 与 shared_ptr': { kpId:'cpp-smart-ptr', name:'智能指针' },
+  '移动语义与右值引用': { kpId:'cpp-move',           name:'移动语义与右值引用' },
+  'Lambda 表达式':      { kpId:'cpp-lambda',         name:'Lambda 表达式' },
+  '文件流':             { kpId:'cpp-file-stream',    name:'文件流' },
+  '字符串流':           { kpId:'cpp-file-stream',    name:'字符串流' },
+  'std::thread':        { kpId:'cpp-thread',         name:'std::thread 线程' },
+  '互斥与条件变量':     { kpId:'cpp-thread',         name:'互斥与条件变量' },
+  '常用设计模式':       { kpId:'cpp-design-pattern', name:'常用设计模式' },
+  '代码规范与调试':     { kpId:'cpp-best-practice',  name:'代码规范与调试' },
 };
 
 // Export
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { CCppVizEngine };
+  module.exports = { CCppVizEngine, ccppVizMap };
 }

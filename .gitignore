@@ -4,3 +4,7 @@ Thumbs.db
 *.pptx
 create_ppt.py
 .workbuddy/
+
+# Python cache
+__pycache__/
+*.pyc
